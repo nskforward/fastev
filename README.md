@@ -1,12 +1,15 @@
 # fastevent/fastevent
 Cross-platform event driven library to develop fast HTTP servers
 
+No external dependencies
+
 Zero memory allocations in hot paths
 
 
 ## TCP echo server
 
 `
+
 #include "fastev/tcp/tcp_server.hpp"
 
 int main()
@@ -27,4 +30,5 @@ int main()
     });
     s.start();
 }
+
 `
