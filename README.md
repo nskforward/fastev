@@ -1,5 +1,5 @@
 # fastevent/fastevent
-Cross-platform event driven library to develop fast HTTP servers
+Cross-platform non-blocking event driven library to develop fast servers
 
 No external dependencies
 
