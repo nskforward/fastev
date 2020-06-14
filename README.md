@@ -1,5 +1,5 @@
 # fastevent
-C/C++ non-blocking event driven library to develop fast servers
+C++17 non-blocking event driven library to develop fast servers
 
 Supported platforms: macOS (kqueue), Linux (epoll)
 
