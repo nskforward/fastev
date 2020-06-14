@@ -1,8 +1,4 @@
-# fastevent/core
-Cross-platform, fast event-driven library.
+# fastevent/fastevent
+Cross-platform event driven library to develop fast HTTP servers
 
-Zero memory allocations in hot paths.
-
-No any magics. No overhead with complex entities.
-
-Everythin is under your control. Fast and easy development of http servers.
+Zero memory allocations in hot paths
