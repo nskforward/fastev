@@ -8,7 +8,7 @@ Zero memory allocations in hot paths
 
 ## TCP echo server
 
-```
+```cp
 #include "fastev/tcp/tcp_server.hpp"
 
 int main()
