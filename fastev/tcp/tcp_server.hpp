@@ -31,7 +31,7 @@ namespace fastev
         void disconnect(int fd);
 
         void start();
-        void tcpReply(int fd, char *message, size_t size);
+        void tcpReply(int fd, const char *message, size_t size);
     };
 } // namespace fastev
 

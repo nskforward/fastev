@@ -56,7 +56,7 @@ namespace fastev
         on_data_cb(fd, chunk, bytes_read);
     }
 
-    void TCPServer::tcpReply(int fd, char *message, size_t size)
+    void TCPServer::tcpReply(int fd, const char *message, size_t size)
     {
         send(fd, message, size, 0);
     }

@@ -1,19 +1,19 @@
-#include "fastev/tcp/tcp_server.hpp"
+#include "fastev/http/http_server.hpp"
+using namespace fastev;
 
 int main()
 {
     try
     {
-        auto s = fastev::TCPServer(8080);
+        auto s = HTTPServer(8080);
         s.onConnect([&](int fd, char *ip, int port) {
-            std::cout << "connect" << std::endl;
+            Logger::log(LogLevel::INFO, "connect");
         });
         s.onDisconnect([&](int fd) {
-            std::cout << "disconnect" << std::endl;
+            Logger::log(LogLevel::INFO, "disconnect");
         });
-        s.onData([&](int fd, char *message, size_t size) {
-            std::cout << "data" << std::endl;
-            s.tcpReply(fd, message, size);
+        s.onData([&](int fd, HTTPRequest *req, HTTPResponse *resp) {
+            resp->setBody("OK");
         });
         s.start();
     }
