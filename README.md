@@ -1,7 +1,7 @@
 # fastevent/fastevent
 Non-blocking event driven library to develop fast servers
 
-Supported platforms: Macos (kqueue), Linux (epoll)
+Supported platforms: macOS (kqueue), Linux (epoll)
 
 No external dependencies
 
