@@ -36,3 +36,8 @@ int main()
     }
 }
 ```
+
+## How to build
+- install g++ make
+- make compile
+- launch ./build/app binary file
