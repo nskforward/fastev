@@ -43,9 +43,9 @@ namespace fastev
         _code = code;
     }
 
-    void HTTPResponse::setBody(std::string body)
+    std::stringstream &HTTPResponse::body()
     {
-        _body = body;
+        return _body;
     }
 
     void HTTPResponse::setHeader(std::string name, std::string value)
@@ -55,7 +55,7 @@ namespace fastev
 
     std::string HTTPResponse::str()
     {
-        setHeader("Content-Length", std::to_string(_body.size()));
+        setHeader("Content-Length", std::to_string(_body.str().size()));
         std::ostringstream ss;
         ss << "HTTP/1.1 " << _code << " " << HTTPCodeToStr(_code) << "\r\n";
         std::map<std::string, std::string>::iterator it = _headers.begin();
@@ -65,7 +65,7 @@ namespace fastev
             it++;
         }
         ss << "\r\n"
-           << _body;
+           << _body.str();
         return ss.str();
     }
 

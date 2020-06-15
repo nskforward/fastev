@@ -25,12 +25,12 @@ namespace fastev
     {
     private:
         HTTPCode _code;
-        std::string _body;
+        std::stringstream _body;
         std::map<std::string, std::string> _headers;
 
     public:
         void setCode(HTTPCode code);
-        void setBody(std::string body);
+        std::stringstream &body();
         void setHeader(std::string name, std::string value);
         std::string str();
         HTTPCode getCode();

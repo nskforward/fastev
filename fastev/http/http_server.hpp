@@ -17,7 +17,7 @@ namespace fastev
     class HTTPServer : public TCPServer
     {
     private:
-        std::function<void(int fd, HTTPRequest *req, HTTPResponse *resp)> on_data_cb;
+        std::function<void(int fd, HTTPRequest &req, HTTPResponse &resp)> on_data_cb;
         BufferPool buffer_pool;
         std::map<int, Buffer *> buffer_map;
 
@@ -28,7 +28,7 @@ namespace fastev
 
     public:
         HTTPServer(int port);
-        void onData(std::function<void(int fd, HTTPRequest *req, HTTPResponse *resp)> func);
+        void onData(std::function<void(int fd, HTTPRequest &req, HTTPResponse &resp)> func);
         void start();
     };
 } // namespace fastev

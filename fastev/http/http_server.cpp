@@ -32,7 +32,7 @@ namespace fastev
         Logger::log(LogLevel::INFO, "read timeout (%d seconds) on fd:%d", FASTEV_HTTP_READ_TIMEOUT, fd);
     }
 
-    void HTTPServer::onData(std::function<void(int fd, HTTPRequest *req, HTTPResponse *resp)> func)
+    void HTTPServer::onData(std::function<void(int fd, HTTPRequest &req, HTTPResponse &resp)> func)
     {
         on_data_cb = func;
     }
@@ -74,12 +74,12 @@ namespace fastev
         resp.setHeader("Content-Type", "text/html;charset=UTF-8");
         try
         {
-            on_data_cb(fd, &req, &resp);
+            on_data_cb(fd, req, resp);
         }
         catch (std::exception &e)
         {
             resp.setCode(HTTPCode::INTERNAL_SERVER_ERROR);
-            resp.setBody("Internal Server Error");
+            resp.body() << "Internal Server Error";
             Logger::log(LogLevel::ERROR, e.what());
         }
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - t1);
