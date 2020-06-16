@@ -11,6 +11,8 @@
 #define FASTEV_REACTOR_POLL_SIZE 16
 #endif
 
+using namespace std;
+
 namespace fastev
 {
     class Reactor
@@ -18,21 +20,20 @@ namespace fastev
     private:
         bool active = true;
         int event_base;
+        function<void()> timer_cb;
 
-        std::function<void(int fd)> on_read_cb;
-        std::function<void()> on_timer_cb;
-        void registry_event(struct kevent *event);
-        void registry_signal_event();
-        void registry_timer_event(time_t seconds);
+        void registryEvent(struct kevent *event);
+        void registrySignal();
+        void registryTimer(time_t seconds);
+        virtual void onSocketEvent(int fd) = 0;
 
     public:
         Reactor();
         ~Reactor();
         void start();
-        void registry_read_event_fd(int fd);
-        void unregistry_read_event_fd(int fd);
-        void registry_callback_on_read(std::function<void(int fd)> func);
-        void registry_callback_on_timer(std::function<void()> func);
+        void watch(int fd);
+        void unwatch(int fd);
+        void onTimer(function<void()> func);
     };
 } // namespace fastev
 

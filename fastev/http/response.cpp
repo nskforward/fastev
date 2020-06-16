@@ -1,4 +1,4 @@
-#include "http_response.hpp"
+#include "response.hpp"
 
 namespace fastev
 {
@@ -36,6 +36,16 @@ namespace fastev
         default:
             return "Unknown";
         }
+    }
+
+    HTTPResponse::HTTPResponse(HTTPRequest &request)
+    {
+        _request = &request;
+    }
+
+    HTTPRequest *HTTPResponse::getRequest()
+    {
+        return _request;
     }
 
     void HTTPResponse::setCode(HTTPCode code)

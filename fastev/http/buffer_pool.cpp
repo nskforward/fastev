@@ -2,27 +2,21 @@
 
 namespace fastev
 {
-    BufferPool::BufferPool()
-    {
-        for (size_t i = 0; i < FASTEV_BUFF_POOL_SIZE; i++)
-        {
-            pool.push_back(new Buffer());
-        }
-    }
-
     BufferPool::~BufferPool()
     {
         for (size_t i = 0; i < pool.size(); i++)
         {
             delete pool[i];
         }
+        Logger::log(LogLevel::TRACE, "deleted %d buffers", pool.size());
     }
 
     Buffer *BufferPool::get()
     {
         if (pool.size() == 0)
         {
-            throw KernelException("pool size is empty");
+            Logger::log(LogLevel::TRACE, "memory allocation");
+            return new Buffer();
         }
         Buffer *buf = pool.back();
         buf->reset();

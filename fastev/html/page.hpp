@@ -4,7 +4,7 @@
 #include <string>
 #include <sstream>
 #include "template.hpp"
-#include "../http/http_response.hpp"
+#include "../http/response.hpp"
 
 namespace fastev
 {

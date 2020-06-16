@@ -1,6 +1,4 @@
-#include "fastev/http/http_server.hpp"
-#include "fastev/html/page.hpp"
-#include "fastev/html/link.hpp"
+#include "fastev/http/server.hpp"
 using namespace fastev;
 
 int main()
@@ -14,18 +12,17 @@ int main()
         s.onDisconnect([&](int fd) {
             Logger::log(LogLevel::INFO, "disconnect");
         });
-        s.onData([&](int fd, HTTPRequest &req, HTTPResponse &resp) {
-            auto page = HTMLPage("tpl/layout.tpl");
-            page.title("Home page");
-            auto p = HTMLTag("p").body("This is");
-            auto a = HTMLLink("/", "home page");
-            page.body() << (p << a);
-            resp << page;
+        s.onRequest([&](HTTPResponse &resp) {
+            resp << "hello world!";
+            if (resp.getRequest()->body != "")
+            {
+                resp << resp.getRequest()->body;
+            }
         });
         s.start();
     }
     catch (std::exception &e)
     {
-        std::cout << e.what() << std::endl;
+        Logger::log(LogLevel::CRITICAL_ERROR, e.what());
     }
 }

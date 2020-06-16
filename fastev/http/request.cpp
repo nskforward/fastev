@@ -1,42 +1,58 @@
-#include "http_request.hpp"
+#include "request.hpp"
 
 namespace fastev
 {
+    HTTPRequest::HTTPRequest() {}
+
     HTTPRequest::HTTPRequest(std::string raw_headers)
     {
-        size_t previous = 0;
-        size_t current = raw_headers.find("\r\n");
-        while (current != std::string::npos)
+        parse(raw_headers);
+    }
+
+    void HTTPRequest::reset()
+    {
+        body.clear();
+        headers.clear();
+        method.clear();
+        uri.clear();
+        proto.clear();
+    }
+
+    void HTTPRequest::parse(std::string &raw_headers)
+    {
+        stringstream ss(raw_headers);
+        bool parsed_headline = false;
+        for (string line; getline(ss, line);)
         {
-            std::string line = raw_headers.substr(previous, current - previous);
-            if (previous == 0)
+            line.erase(line.find_last_not_of("\r") + 1);
+            if (!parsed_headline)
             {
                 parseHeadLine(line);
+                parsed_headline = true;
+                continue;
             }
-            else
+            if (line == "")
             {
-                parseHeader(line);
+                break;
             }
-            previous = current + 2;
-            current = raw_headers.find("\r\n", previous);
+            parseHeader(line);
         }
     }
 
     void HTTPRequest::parseHeadLine(std::string line)
     {
-        size_t previous = 0;
-        size_t current = line.find(" ");
-        method = line.substr(previous, current - previous);
-        previous = current + 1;
-        current = line.find(" ", previous);
-        uri = line.substr(previous, current - previous);
+        stringstream ss(line);
+        string word;
+        getline(ss, word, ' ');
+        method = word;
+        getline(ss, word, ' ');
+        uri = word;
         if (uri.size() > 1 && uri.at(uri.size() - 1) == '/')
         {
             uri.resize(uri.size() - 1);
         }
-        previous = current + 1;
-        current = line.size();
-        proto = line.substr(previous, current - previous);
+        getline(ss, word, ' ');
+        proto = word;
     }
 
     void HTTPRequest::parseHeader(std::string line)

@@ -4,11 +4,8 @@
 #include <vector>
 #include <iterator>
 #include "buffer.hpp"
+#include "../core/logger.hpp"
 #include "../core/exception.hpp"
-
-#ifndef FASTEV_BUFF_POOL_SIZE
-#define FASTEV_BUFF_POOL_SIZE 32
-#endif
 
 namespace fastev
 {
@@ -18,7 +15,6 @@ namespace fastev
         std::vector<Buffer *> pool;
 
     public:
-        BufferPool();
         ~BufferPool();
         Buffer *get();
         void put(Buffer *buf);

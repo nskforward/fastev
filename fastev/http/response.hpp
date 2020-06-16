@@ -5,6 +5,7 @@
 #include <sstream>
 #include <map>
 #include <iterator>
+#include "request.hpp"
 
 namespace fastev
 {
@@ -27,13 +28,21 @@ namespace fastev
         HTTPCode _code;
         std::stringstream _body;
         std::map<std::string, std::string> _headers;
+        HTTPRequest *_request;
 
     public:
+        HTTPResponse(HTTPRequest &request);
         void setCode(HTTPCode code);
         std::stringstream &body();
         void setHeader(std::string name, std::string value);
         std::string str();
         HTTPCode getCode();
+        HTTPRequest *getRequest();
+
+        void operator<<(std::string text)
+        {
+            _body << text;
+        }
     };
 
 } // namespace fastev

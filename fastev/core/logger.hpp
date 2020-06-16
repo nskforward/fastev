@@ -37,7 +37,7 @@ namespace fastev
                 return;
             }
             auto str = Format::str(format, args...);
-            std::cout << std::put_time(getTime(), "[%Y-%m-%d %X %i]") << " -" << levelStr(level) << "- " << str << std::endl;
+            std::cout << std::put_time(getTime(), "[%Y-%m-%d %X]") << " -" << levelStr(level) << "- " << str << std::endl;
         }
     };
 

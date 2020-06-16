@@ -11,21 +11,22 @@ Zero memory allocations in hot paths
 ## TCP echo server
 
 ```cp
-#include "fastev/tcp/tcp_server.hpp"
+#include "fastev/tcp/server.hpp"
+using namespace fastev;
 
 int main()
 {
     try
     {
-        auto s = fastev::TCPServer(8080);
+        auto s = TCPServer(8080);
         s.onConnect([&](int fd, char *ip, int port) {
-            std::cout << "connect" << std::endl;
+            Logger::log(LogLevel::INFO, "connect");
         });
         s.onDisconnect([&](int fd) {
-            std::cout << "disconnect" << std::endl;
+            Logger::log(LogLevel::INFO, "disconnect");
         });
-        s.onData([&](int fd, char *message, size_t size) {
-            std::cout << "data" << std::endl;
+        s.onChunk([&](int fd, char *message, size_t size) {
+            Logger::log(LogLevel::INFO, "receive %d bytes", size);
             s.tcpReply(fd, message, size);
         });
         s.start();
@@ -40,24 +41,21 @@ int main()
 ## Simple HTTP server
 
 ```cp
-#include "fastev/http/http_server.hpp"
+#include "fastev/http/server.hpp"
 using namespace fastev;
 
 int main()
 {
     try
     {
-        auto s = HTTPServer(8080);
-        s.onConnect([&](int fd, char *ip, int port) {
-            Logger::log(LogLevel::INFO, "connect");
+        auto app = HTTPServer(8080);
+        app.registryHandler("/", [&](HTTPResponse &resp) {
+            resp << "home";
         });
-        s.onDisconnect([&](int fd) {
-            Logger::log(LogLevel::INFO, "disconnect");
+        app.registryHandler("/about", [&](HTTPResponse &resp) {
+            resp << "about";
         });
-        s.onData([&](int fd, HTTPRequest *req, HTTPResponse *resp) {
-            resp->setBody("OK");
-        });
-        s.start();
+        app.start();
     }
     catch (std::exception &e)
     {
