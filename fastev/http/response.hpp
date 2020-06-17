@@ -5,43 +5,35 @@
 #include <sstream>
 #include <map>
 #include <iterator>
+#include "http.hpp"
 #include "request.hpp"
+
+using namespace std;
 
 namespace fastev
 {
-    enum HTTPCode
-    {
-        OK = 200,
-        FOUND = 302,
-        BAD_REQUEST = 400,
-        UNAUTHORIZED = 401,
-        FORBIDDEN = 403,
-        NOT_FOUND = 404,
-        REQUEST_TIMEOUT = 408,
-        INTERNAL_SERVER_ERROR = 500,
-        SERVICE_UNAVAILABLE = 503
-    };
-
     class HTTPResponse
     {
     private:
         HTTPCode _code;
-        std::stringstream _body;
-        std::map<std::string, std::string> _headers;
-        HTTPRequest *_request;
+        stringstream _body;
+        string response_buf;
+        map<string, string> _headers;
+        HTTPRequest _request;
 
     public:
         HTTPResponse(HTTPRequest &request);
         void setCode(HTTPCode code);
-        std::stringstream &body();
-        void setHeader(std::string name, std::string value);
-        std::string str();
+        stringstream &body();
+        void setHeader(string name, string value);
+        string str();
         HTTPCode getCode();
-        HTTPRequest *getRequest();
+        HTTPRequest &getRequest();
 
-        void operator<<(std::string text)
+        HTTPResponse &operator<<(string src)
         {
-            _body << text;
+            _body << src;
+            return *this;
         }
     };
 

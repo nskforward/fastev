@@ -4,6 +4,7 @@ namespace fastev
 {
     void Buffer::append(char *chunk, size_t size)
     {
+
         if (_data.size() > FASTEV_BUFF_SIZE)
         {
             throw KernelException("buffer size %d overflow", FASTEV_BUFF_SIZE);
@@ -12,7 +13,7 @@ namespace fastev
         last_access = chrono::system_clock::now();
         if (delimiter_pos == 0)
         {
-            delimiter_pos = getDelimiter(chunk, size);
+            delimiter_pos = getDelimiterPos(chunk, size);
             if (delimiter_pos == 0)
             {
                 return;
@@ -27,9 +28,16 @@ namespace fastev
                 return;
             }
         }
-        if (_data.size() >= delimiter_pos + 4 + content_len)
+        if (_data.size() == delimiter_pos + 4 + content_len)
         {
             is_full = true;
+            return;
+        }
+        if (_data.size() > delimiter_pos + 4 + content_len)
+        {
+            _data.resize(delimiter_pos + 4 + content_len);
+            is_full = true;
+            return;
         }
     }
 
@@ -48,7 +56,7 @@ namespace fastev
         return std::stoi(_data.substr(pos1 + 16, pos2 - pos1 - 16));
     }
 
-    int Buffer::getDelimiter(char *bytes, size_t size)
+    int Buffer::getDelimiterPos(char *bytes, size_t size)
     {
         if (size > 3)
         {
@@ -87,18 +95,18 @@ namespace fastev
         return chrono::duration_cast<chrono::seconds>(chrono::system_clock::now() - last_access) > chrono::seconds(seconds);
     }
 
-    bool Buffer::hasBody()
+    const char *Buffer::c_str()
     {
-        return content_len > 0;
+        return _data.c_str();
     }
 
-    string Buffer::headerStr()
+    size_t Buffer::delimiter()
     {
-        return _data.substr(0, delimiter_pos);
+        return delimiter_pos;
     }
 
-    string Buffer::bodyStr()
+    size_t Buffer::size()
     {
-        return _data.substr(delimiter_pos + 4;
+        return _data.size();
     }
 } // namespace fastev

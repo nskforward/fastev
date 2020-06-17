@@ -3,6 +3,9 @@
 
 #include <string>
 #include <iostream>
+#include <memory>
+#include <string.h>
+#include <stdarg.h>
 
 namespace fastev
 {

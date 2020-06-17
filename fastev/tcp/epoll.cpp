@@ -10,7 +10,7 @@ namespace fastev
         {
             throw KernelException("cannot create event base epoll");
         }
-        sigint_fd = registry_signal_event();
+        sigint_fd = registrySignal();
         Logger::log(LogLevel::INFO, "event method is epoll");
     }
 
@@ -19,39 +19,7 @@ namespace fastev
         close(event_base);
     }
 
-    void Reactor::registry_read_event_fd(int fd)
-    {
-        struct epoll_event ev;
-        ev.events = EPOLLIN;
-        ev.data.fd = fd;
-        if (epoll_ctl(event_base, EPOLL_CTL_ADD, fd, &ev) == -1)
-        {
-            throw KernelException("cannot registry an event");
-        }
-    }
-
-    void Reactor::unregistry_read_event_fd(int fd)
-    {
-        struct epoll_event ev;
-        ev.events = EPOLLIN;
-        ev.data.fd = fd;
-        if (epoll_ctl(event_base, EPOLL_CTL_DEL, fd, &ev) == -1)
-        {
-            throw KernelException("cannot registry an event");
-        }
-    }
-
-    void Reactor::registry_callback_on_read(std::function<void(int fd)> func)
-    {
-        on_read_cb = func;
-    }
-
-    void Reactor::registry_callback_on_timer(std::function<void()> func)
-    {
-        on_timer_cb = func;
-    }
-
-    int Reactor::registry_timer_event(time_t seconds)
+    int Reactor::registryTimer(time_t seconds)
     {
         struct itimerspec tspec;
         tspec.it_value.tv_sec = 1;
@@ -64,11 +32,11 @@ namespace fastev
             throw KernelException("timerfd_create() failed");
         }
         timerfd_settime(fd, TFD_TIMER_ABSTIME, &tspec, NULL);
-        registry_read_event_fd(fd);
+        watch(fd);
         return fd;
     }
 
-    int Reactor::registry_signal_event()
+    int Reactor::registrySignal()
     {
         sigset_t mask;
         sigemptyset(&mask);
@@ -82,21 +50,41 @@ namespace fastev
         {
             throw KernelException("signalfd() failed");
         }
-        registry_read_event_fd(fd);
+        watch(fd);
         return fd;
+    }
+
+    void Reactor::watch(int fd)
+    {
+        struct epoll_event ev;
+        ev.events = EPOLLIN;
+        ev.data.fd = fd;
+        if (epoll_ctl(event_base, EPOLL_CTL_ADD, fd, &ev) == -1)
+        {
+            throw KernelException("cannot registry an event");
+        }
+    }
+
+    void Reactor::unwatch(int fd)
+    {
+        struct epoll_event ev;
+        ev.events = EPOLLIN;
+        ev.data.fd = fd;
+        if (epoll_ctl(event_base, EPOLL_CTL_DEL, fd, &ev) == -1)
+        {
+            throw KernelException("cannot registry an event");
+        }
+    }
+
+    void Reactor::onTimer(std::function<void()> func)
+    {
+        timer_fd = registryTimer(10);
+        timer_cb = func;
     }
 
     // START LOOP
     void Reactor::start()
     {
-        if (on_timer_cb != NULL)
-        {
-            timer_fd = registry_timer_event(10);
-        }
-        if (on_read_cb == NULL)
-        {
-            throw KernelException("registry_callback_on_read() nust be called before start()");
-        }
         struct epoll_event active_events[FASTEV_REACTOR_POLL_SIZE];
         while (active)
         {
@@ -121,10 +109,10 @@ namespace fastev
                 {
                     char buf[8];
                     ssize_t bytes = read(timer_fd, &buf, 8);
-                    on_timer_cb();
+                    timer_cb();
                     continue;
                 }
-                on_read_cb(active_events[i].data.fd);
+                onSocketEvent(active_events[i].data.fd);
             }
         }
     }

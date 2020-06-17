@@ -18,21 +18,23 @@ namespace fastev
     {
     private:
         string _data;
+        string _headers;
+        string _body;
         size_t content_len = 0;
         size_t delimiter_pos = 0;
         bool is_full = false;
 
         chrono::system_clock::time_point last_access;
-        int getDelimiter(char *bytes, size_t size);
+        int getDelimiterPos(char *bytes, size_t size);
         int getContenLen();
 
     public:
         void append(char *bytes, size_t size);
         void reset();
         bool isFull();
-        bool hasBody();
-        string headerStr();
-        string bodyStr();
+        const char *c_str();
+        size_t delimiter();
+        size_t size();
         bool older(int seconds);
     };
 } // namespace fastev

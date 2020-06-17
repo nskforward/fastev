@@ -4,23 +4,17 @@ namespace fastev
 {
     HTTPRequest::HTTPRequest() {}
 
-    HTTPRequest::HTTPRequest(std::string raw_headers)
+    HTTPRequest::HTTPRequest(Buffer *buf)
     {
-        parse(raw_headers);
+        const char *source = buf->c_str();
+        string raw_headers = string(source, buf->delimiter() + 2);
+        _body = string(source + buf->delimiter() + 4, buf->size() - buf->delimiter() - 4);
+        parse(&raw_headers);
     }
 
-    void HTTPRequest::reset()
+    void HTTPRequest::parse(string *raw_headers)
     {
-        body.clear();
-        headers.clear();
-        method.clear();
-        uri.clear();
-        proto.clear();
-    }
-
-    void HTTPRequest::parse(std::string &raw_headers)
-    {
-        stringstream ss(raw_headers);
+        stringstream ss(*raw_headers);
         bool parsed_headline = false;
         for (string line; getline(ss, line);)
         {
@@ -39,43 +33,64 @@ namespace fastev
         }
     }
 
-    void HTTPRequest::parseHeadLine(std::string line)
+    void HTTPRequest::parseHeadLine(string line)
     {
         stringstream ss(line);
-        string word;
-        getline(ss, word, ' ');
-        method = word;
-        getline(ss, word, ' ');
-        uri = word;
-        if (uri.size() > 1 && uri.at(uri.size() - 1) == '/')
+        for (string word; getline(ss, word, ' ');)
         {
-            uri.resize(uri.size() - 1);
+            if (_method == "")
+            {
+                _method = word;
+                continue;
+            }
+            if (_uri == "")
+            {
+                _uri = word;
+                continue;
+            }
+            if (_proto == "")
+            {
+                _proto = word;
+                continue;
+            }
         }
-        getline(ss, word, ' ');
-        proto = word;
+        if (_uri.size() > 1 && _uri.at(_uri.size() - 1) == '/')
+        {
+            _uri.resize(_uri.size() - 1);
+        }
     }
 
-    void HTTPRequest::parseHeader(std::string line)
+    void HTTPRequest::parseHeader(string line)
     {
         size_t previous = 0;
         size_t current = line.find(": ");
-        std::string name = line.substr(previous, current - previous);
-        std::string value = line.substr(current + 2, line.size() - current + 2);
-        headers[name] = value;
+        string name = line.substr(previous, current - previous);
+        string value = line.substr(current + 2, line.size() - current + 2);
+        _headers[name] = value;
     }
 
-    std::string HTTPRequest::getMethod()
+    string HTTPRequest::getMethod()
     {
-        return method;
+        return _method;
     }
 
-    std::string HTTPRequest::getURI()
+    string HTTPRequest::getURI()
     {
-        return uri;
+        return _uri;
     }
 
-    std::string HTTPRequest::getHeader(std::string name)
+    string HTTPRequest::getProto()
     {
-        return headers[name];
+        return _proto;
+    }
+
+    string HTTPRequest::getHeader(string name)
+    {
+        return _headers[name];
+    }
+
+    string HTTPRequest::getBody()
+    {
+        return _body;
     }
 } // namespace fastev

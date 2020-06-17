@@ -70,6 +70,10 @@ namespace fastev
             disconnect(fd);
             return;
         }
+        if (bytes_read > 1024)
+        {
+            return;
+        }
         chunk_cb(fd, chunk, bytes_read);
     }
 } // namespace fastev

@@ -1,0 +1,28 @@
+== Info:   Trying 127.0.0.1...
+== Info: TCP_NODELAY set
+== Info: Connected to localhost (127.0.0.1) port 8080 (#0)
+=> Send header, 83 bytes (0x53)
+0000: 47 45 54 20 2f 68 65 6c 6c 6f 20 48 54 54 50 2f GET /hello HTTP/
+0010: 31 2e 31 0d 0a 48 6f 73 74 3a 20 6c 6f 63 61 6c 1.1..Host: local
+0020: 68 6f 73 74 3a 38 30 38 30 0d 0a 55 73 65 72 2d host:8080..User-
+0030: 41 67 65 6e 74 3a 20 63 75 72 6c 2f 37 2e 36 34 Agent: curl/7.64
+0040: 2e 31 0d 0a 41 63 63 65 70 74 3a 20 2a 2f 2a 0d .1..Accept: */*.
+0050: 0a 0d 0a                                        ...
+<= Recv header, 17 bytes (0x11)
+0000: 48 54 54 50 2f 31 2e 31 20 32 30 30 20 4f 4b 0d HTTP/1.1 200 OK.
+0010: 0a                                              .
+<= Recv header, 19 bytes (0x13)
+0000: 43 6f 6e 74 65 6e 74 2d 4c 65 6e 67 74 68 3a 20 Content-Length: 
+0010: 35 0d 0a                                        5..
+<= Recv header, 39 bytes (0x27)
+0000: 43 6f 6e 74 65 6e 74 2d 54 79 70 65 3a 20 74 65 Content-Type: te
+0010: 78 74 2f 68 74 6d 6c 3b 63 68 61 72 73 65 74 3d xt/html;charset=
+0020: 55 54 46 2d 38 0d 0a                            UTF-8..
+<= Recv header, 22 bytes (0x16)
+0000: 48 6f 73 74 3a 20 6c 6f 63 61 6c 68 6f 73 74 3a Host: localhost:
+0010: 38 30 38 30 0d 0a                               8080..
+<= Recv header, 2 bytes (0x2)
+0000: 0d 0a                                           ..
+<= Recv data, 5 bytes (0x5)
+0000: 68 65 6c 6c 6f                                  hello
+== Info: Connection #0 to host localhost left intact

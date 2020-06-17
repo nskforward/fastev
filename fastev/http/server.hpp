@@ -3,8 +3,9 @@
 #include "../tcp/server.hpp"
 #include "buffer_pool.hpp"
 #include <iterator>
-#include "request.hpp"
+#include "http.hpp"
 #include "response.hpp"
+
 using namespace std;
 
 namespace fastev
@@ -13,7 +14,7 @@ namespace fastev
     {
     private:
         function<void(HTTPResponse &resp)> request_cb;
-        std::map<int, Buffer *> buffer_map;
+        map<int, Buffer *> buffer_map;
         BufferPool buffer_pool;
 
         void onTimer();
