@@ -1,4 +1,4 @@
-# libfastev
+# Fastev
 C++17 non-blocking event driven library to develop fast servers
 
 Supported platforms: macOS (kqueue), Linux (epoll)
