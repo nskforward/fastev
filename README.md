@@ -77,12 +77,12 @@ wrk -t5 -c100 -d20 http://localhost:8080/benchmark
 Running 20s test @ http://localhost:8080/benchmark
   5 threads and 100 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   133.28ms  123.85ms   1.94s    84.31%
-    Req/Sec   357.68k   106.04k  634.51k    67.71%
-  35703395 requests in 20.11s, 3.66GB read
-  Socket errors: connect 0, read 75, write 0, timeout 76
-Requests/sec: 1775512.56
-Transfer/sec:    186.26MB
+    Latency   162.62ms  134.40ms   1.82s    74.54%
+    Req/Sec   358.51k   131.56k  775.48k    70.77%
+  35756203 requests in 20.09s, 3.66GB read
+Requests/sec: 1779518.22
+Transfer/sec:    186.68MB
+
 ```
 
 

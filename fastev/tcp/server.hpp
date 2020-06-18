@@ -9,6 +9,10 @@
 #endif
 #include "socket.hpp"
 
+#ifndef FASTEV_TCP_CHUNK_SIZE
+#define FASTEV_TCP_CHUNK_SIZE 48
+#endif
+
 using namespace std;
 
 namespace fastev

@@ -59,14 +59,14 @@ namespace fastev
             return;
         }
         // NEW DATA
-        char chunk[512];
+        char chunk[FASTEV_TCP_CHUNK_SIZE];
         size_t bytes_read = recv(fd, chunk, sizeof(chunk), 0);
         if (bytes_read < 1) // client disconnected
         {
             disconnect(fd);
             return;
         }
-        if (bytes_read > 512)
+        if (bytes_read > FASTEV_TCP_CHUNK_SIZE)
         {
             return;
         }
