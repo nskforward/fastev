@@ -19,7 +19,7 @@ namespace fastev
         INFO,
         WARNING,
         ERROR,
-        CRITICAL_ERROR,
+        FATAL_ERROR
     };
 
     class Logger
