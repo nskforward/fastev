@@ -55,8 +55,8 @@ int main()
 ```
 
 ## Benchmark
-Test - a http server that always returns uri request is called. Logging is disable. Tests ran on the same machine.
-The goal of benchmark is to show the difference, not the absolute values.
+Testing of 2 HTTP servers based on different libraries to see the difference.
+The test scenario is returning called URI (to involve http parser).
 
 ### 1. HTTP server based on libevent
 ```
@@ -84,6 +84,8 @@ Requests/sec: 1779518.22
 Transfer/sec:    186.68MB
 
 ```
+
+Fastev is able to serve x20 req/sec more than libevent on the same resources.
 
 
 ## How to build
