@@ -3,8 +3,10 @@
 #include "../tcp/server.hpp"
 #include "buffer_pool.hpp"
 #include <iterator>
-#include "http.hpp"
+#include "utils.hpp"
 #include "response.hpp"
+#include "exception.hpp"
+#include <sstream>
 
 using namespace std;
 
@@ -13,18 +15,20 @@ namespace fastev
     class HTTPServer : public TCPServer
     {
     private:
-        function<void(HTTPResponse &resp)> request_cb;
-        map<int, Buffer *> buffer_map;
+        function<void(int fd, ByteBuffer *buf)> request_cb;
+        map<int, ByteBuffer *> buffer_map;
         BufferPool buffer_pool;
+        stringstream reply_buf;
 
         void onTimer();
         void onChunk(int fd, char *data, size_t size);
-        void onBufferFull(int fd, Buffer *data);
+        void onBufferFull(int fd, ByteBuffer *data);
 
     public:
         HTTPServer(int port);
         ~HTTPServer();
-        void onRequest(function<void(HTTPResponse &resp)> func);
+        void onRequest(function<void(int fd, ByteBuffer *buf)> func);
+        void httpReply(int fd, HTTPCode code, string type, string body);
     };
 
 } // namespace fastev

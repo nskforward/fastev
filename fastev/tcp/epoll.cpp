@@ -32,7 +32,7 @@ namespace fastev
             throw KernelException("timerfd_create() failed");
         }
         timerfd_settime(fd, TFD_TIMER_ABSTIME, &tspec, NULL);
-        watch(fd);
+        watchRead(fd);
         return fd;
     }
 
@@ -50,11 +50,11 @@ namespace fastev
         {
             throw KernelException("signalfd() failed");
         }
-        watch(fd);
+        watchRead(fd);
         return fd;
     }
 
-    void Reactor::watch(int fd)
+    void Reactor::watchRead(int fd)
     {
         struct epoll_event ev;
         ev.events = EPOLLIN;

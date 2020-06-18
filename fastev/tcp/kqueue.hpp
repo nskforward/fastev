@@ -8,7 +8,7 @@
 #include "../core/exception.hpp"
 
 #ifndef FASTEV_REACTOR_POLL_SIZE
-#define FASTEV_REACTOR_POLL_SIZE 16
+#define FASTEV_REACTOR_POLL_SIZE 128
 #endif
 
 using namespace std;
@@ -31,7 +31,7 @@ namespace fastev
         Reactor();
         ~Reactor();
         void start();
-        void watch(int fd);
+        void watchRead(int fd);
         void unwatch(int fd);
         void onTimer(function<void()> func);
     };

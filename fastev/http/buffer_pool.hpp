@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <iterator>
-#include "buffer.hpp"
+#include "byte_buffer.hpp"
 #include "../core/logger.hpp"
 #include "../core/exception.hpp"
 
@@ -12,13 +12,14 @@ namespace fastev
     class BufferPool
     {
     private:
-        std::vector<Buffer *> pool;
+        std::vector<ByteBuffer *> pool;
 
     public:
         ~BufferPool();
-        Buffer *get();
-        void put(Buffer *buf);
+        ByteBuffer *get();
+        void put(ByteBuffer *buf);
     };
+
 } // namespace fastev
 
 #endif

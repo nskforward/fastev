@@ -5,7 +5,7 @@ namespace fastev
     TCPServer::TCPServer(int port) : Reactor()
     {
         master_sock = get_tcp_socket_fd(port);
-        watch(master_sock);
+        watchRead(master_sock);
         Logger::log(LogLevel::INFO, "server is started on port %d", port);
     }
 
@@ -54,23 +54,19 @@ namespace fastev
             int child_socket = accept_tcp_connection(master_sock, ip, &port);
             if (child_socket > 0)
             {
-                watch(child_socket);
-                if (connect_cb != NULL)
-                {
-                    connect_cb(child_socket, ip, port);
-                }
+                watchRead(child_socket);
             }
             return;
         }
         // NEW DATA
-        char chunk[1024];
+        char chunk[512];
         size_t bytes_read = recv(fd, chunk, sizeof(chunk), 0);
         if (bytes_read < 1) // client disconnected
         {
             disconnect(fd);
             return;
         }
-        if (bytes_read > 1024)
+        if (bytes_read > 512)
         {
             return;
         }

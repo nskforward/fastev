@@ -5,7 +5,7 @@
 #include <sstream>
 #include <map>
 #include <iterator>
-#include "http.hpp"
+#include "utils.hpp"
 #include "request.hpp"
 
 using namespace std;

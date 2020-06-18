@@ -35,7 +35,7 @@ namespace fastev
         Reactor();
         ~Reactor();
         void start();
-        void watch(int fd);
+        void watchRead(int fd);
         void unwatch(int fd);
         void onTimer(function<void()> func);
     };

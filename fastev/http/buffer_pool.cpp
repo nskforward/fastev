@@ -11,20 +11,20 @@ namespace fastev
         Logger::log(LogLevel::TRACE, "deleted %d buffers", pool.size());
     }
 
-    Buffer *BufferPool::get()
+    ByteBuffer *BufferPool::get()
     {
         if (pool.size() == 0)
         {
-            Logger::log(LogLevel::TRACE, "memory allocation");
-            return new Buffer();
+            Logger::log(LogLevel::TRACE, "byte buffer allocation");
+            return new ByteBuffer();
         }
-        Buffer *buf = pool.back();
+        ByteBuffer *buf = pool.back();
         buf->reset();
         pool.pop_back();
         return buf;
     }
 
-    void BufferPool::put(Buffer *buf)
+    void BufferPool::put(ByteBuffer *buf)
     {
         pool.push_back(buf);
     }

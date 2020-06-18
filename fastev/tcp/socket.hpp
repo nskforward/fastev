@@ -4,6 +4,7 @@
 #include <netdb.h>
 #include <string>
 #include <unistd.h>
+#include <fcntl.h>
 #include "../core/exception.hpp"
 
 namespace fastev

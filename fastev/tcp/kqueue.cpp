@@ -52,7 +52,7 @@ namespace fastev
         registryEvent(&ev);
     }
 
-    void Reactor::watch(int fd)
+    void Reactor::watchRead(int fd)
     {
         struct kevent ev;
         EV_SET(&ev, fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
@@ -70,12 +70,13 @@ namespace fastev
     void Reactor::start()
     {
         struct kevent active_events[FASTEV_REACTOR_POLL_SIZE];
+        struct timespec kqTimeout = {2, 0}; // 2s
         while (active)
         {
-            int found_events = kevent(event_base, NULL, 0, active_events, FASTEV_REACTOR_POLL_SIZE, NULL);
+            int found_events = kevent(event_base, NULL, 0, active_events, FASTEV_REACTOR_POLL_SIZE, &kqTimeout);
             if (found_events == 0)
             {
-                throw KernelException("error code:%d on 'kevent()'", found_events);
+                continue; // timeout
             }
             if (found_events < 0)
             {
@@ -100,7 +101,9 @@ namespace fastev
                 if (active_events[i].filter == EVFILT_READ)
                 {
                     onSocketEvent(active_events[i].ident);
+                    continue;
                 }
+                Logger::log(LogLevel::ERROR, "unknown kqueue event: %d", active_events[i].filter);
             }
         }
     }

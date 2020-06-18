@@ -4,49 +4,34 @@ namespace fastev
 {
     int get_tcp_socket_fd(int port)
     {
-        struct addrinfo *addr;
-        struct addrinfo hints;
-
-        /* open a TCP socket */
-        memset(&hints, 0, sizeof hints);
-        hints.ai_family = PF_UNSPEC;     /* any supported protocol */
-        hints.ai_flags = AI_PASSIVE;     /* result for bind() */
-        hints.ai_socktype = SOCK_STREAM; /* TCP */
-        char port_str[5];
-        int error = getaddrinfo("0.0.0.0", std::to_string(port).c_str(), &hints, &addr);
-        if (error)
-        {
-            throw KernelException("cannot get addrinfo: %s", gai_strerror(error));
-        }
-
-        int local_s = socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
+        int local_s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (local_s == -1)
         {
-            std::cout << "cannot create socket" << std::endl;
             throw KernelException("cannot create socket fd");
         }
-
-        // SET OPTTIONS
         int optval = 1;
         if (setsockopt(local_s, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) == -1)
         {
             close(local_s);
             throw KernelException("cannot setsockopt SOL_SOCKET SO_REUSEPORT");
         }
-
         if (setsockopt(local_s, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval)) == -1)
         {
             close(local_s);
             throw KernelException("cannot setsockopt SOL_SOCKET SO_KEEPALIVE");
         }
-
-        // BIND
-        if (bind(local_s, addr->ai_addr, addr->ai_addrlen) == -1)
+        fcntl(local_s, F_SETFL, O_NONBLOCK);
+        struct sockaddr_in serverAddr;
+        memset(&serverAddr, 0, sizeof(struct sockaddr_in));
+        serverAddr.sin_family = AF_INET;
+        serverAddr.sin_port = htons(port);
+        serverAddr.sin_addr.s_addr = INADDR_ANY;
+        if (bind(local_s, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1)
         {
             close(local_s);
             throw KernelException("cannot bind socket to port");
         }
-        if (listen(local_s, SOMAXCONN) == -1)
+        if (listen(local_s, SOMAXCONN) != 0)
         {
             close(local_s);
             throw KernelException("cannot listen socket");
@@ -63,6 +48,7 @@ namespace fastev
         {
             throw KernelException("cannot accept connection");
         }
+        fcntl(child_sock, F_SETFL, O_NONBLOCK);
         char hbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
         if (getnameinfo(&addr, socklen, hbuf, sizeof(hbuf), sbuf, sizeof(sbuf), NI_NUMERICHOST | NI_NUMERICSERV) != 0)
         {

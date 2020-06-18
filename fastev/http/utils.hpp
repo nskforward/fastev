@@ -1,6 +1,8 @@
 #ifndef FASTEV_HTTP_HPP
 #define FASTEV_HTTP_HPP
 
+#include "../core/exception.hpp"
+
 namespace fastev
 {
     enum HTTPCode
@@ -15,6 +17,8 @@ namespace fastev
         INTERNAL_SERVER_ERROR = 500,
         SERVICE_UNAVAILABLE = 503
     };
-}
+
+    std::string http_code_to_str(HTTPCode code);
+} // namespace fastev
 
 #endif
