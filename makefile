@@ -1,5 +1,5 @@
 run:
-	g++ -std=c++17 ./*.cpp ./*/*/*.cpp -o ./build/app && ./build/app
+	g++ -std=c++17 ./*.cpp ./*/*/*.cpp -o ./build/app && clear && ./build/app
 
 compile:
 	mkdir -p ./build

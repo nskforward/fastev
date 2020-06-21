@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <iostream>
 #include <chrono>
+#include <mutex>
 
 #ifndef FASTEV_LOG_LEVEL
 #define FASTEV_LOG_LEVEL 0
@@ -28,6 +29,7 @@ namespace fastev
         static std::string levelStr(LogLevel level);
         static tm *getTime();
 
+    protected:
     public:
         template <typename... Args>
         static void log(LogLevel level, const std::string format, Args... args)

@@ -12,6 +12,7 @@ Zero memory allocations in hot paths
 
 ```cp
 #include "fastev/tcp/server.hpp"
+
 using namespace fastev;
 
 int main()
@@ -19,21 +20,19 @@ int main()
     try
     {
         auto s = TCPServer(8080);
-        s.onConnect([&](int fd, char *ip, int port) {
-            Logger::log(LogLevel::INFO, "connect");
+        s.onConnect([](int fd, struct sockaddr &addr) {
+            Logger::log(LogLevel::INFO, "connected");
         });
-        s.onDisconnect([&](int fd) {
-            Logger::log(LogLevel::INFO, "disconnect");
+        s.onDisonnect([](int fd) {
+            Logger::log(LogLevel::INFO, "disconnected");
         });
-        s.onChunk([&](int fd, char *message, size_t size) {
-            Logger::log(LogLevel::INFO, "receive %d bytes", size);
-            s.tcpReply(fd, message, size);
+        s.start([](int fd, char *chunk, size_t size) {
+            send(fd, chunk, size, 0);
         });
-        s.start();
     }
     catch (std::exception &e)
     {
-        std::cout << e.what() << std::endl;
+        Logger::log(LogLevel::FATAL_ERROR, e.what());
     }
 }
 ```
@@ -42,6 +41,7 @@ int main()
 
 ```cp
 #include "fastev/http/server.hpp"
+
 using namespace fastev;
 
 int main()
@@ -49,10 +49,16 @@ int main()
     try
     {
         auto s = HTTPServer(8080);
-        s.onRequest([&](int fd, ByteBuffer *buf) {
-            s.httpReply(fd, HTTPCode::OK, "text/html;charset=UTF-8", buf->getURI());
+        s.onConnect([](int fd, struct sockaddr &addr) {
+            Logger::log(LogLevel::INFO, "connected");
         });
-        s.start();
+        s.onDisonnect([](int fd) {
+            Logger::log(LogLevel::INFO, "disconnected");
+        });
+        s.start([](InputBuffer *req, OutputBuffer *resp) {
+            resp->setHeader("Content-Type", "text/html;charset=UTF-8");
+            resp->body() << req->getMethod() << " " << req->getURI();
+        });
     }
     catch (std::exception &e)
     {
@@ -80,15 +86,15 @@ Transfer/sec:      9.61MB
 
 ### 2. HTTP server based on fastev
 ```
-wrk -t5 -c100 -d20 http://localhost:8080/benchmark
+wrk -t10 -c100 -d20 http://localhost:8080/benchmark
 Running 20s test @ http://localhost:8080/benchmark
-  5 threads and 100 connections
+  10 threads and 100 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   162.62ms  134.40ms   1.82s    74.54%
-    Req/Sec   358.51k   131.56k  775.48k    70.77%
-  35756203 requests in 20.09s, 3.66GB read
-Requests/sec: 1779518.22
-Transfer/sec:    186.68MB
+    Latency     1.34ms    0.88ms  70.67ms   99.85%
+    Req/Sec     7.60k   249.56     8.18k    82.69%
+  1520768 requests in 20.10s, 165.34MB read
+Requests/sec:  75653.08
+Transfer/sec:      8.22MB
 
 ```
 

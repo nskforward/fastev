@@ -1,4 +1,4 @@
-#include "response.hpp"
+#include "output_buffer.hpp"
 
 namespace fastev
 {
@@ -38,37 +38,33 @@ namespace fastev
         }
     }
 
-    HTTPResponse::HTTPResponse(HTTPRequest &request)
+    OutputBuffer::OutputBuffer(string host)
     {
-        _request = request;
+        _headers["Host"] = host;
     }
 
-    HTTPRequest &HTTPResponse::getRequest()
-    {
-        return _request;
-    }
-
-    void HTTPResponse::setCode(HTTPCode code)
+    void OutputBuffer::setCode(HTTPCode code)
     {
         _code = code;
     }
 
-    std::stringstream &HTTPResponse::body()
+    void OutputBuffer::clearBody()
+    {
+        _body.str(string(""));
+    }
+
+    std::stringstream &OutputBuffer::body()
     {
         return _body;
     }
 
-    void HTTPResponse::setHeader(std::string name, std::string value)
+    void OutputBuffer::setHeader(std::string name, std::string value)
     {
         _headers[name] = value;
     }
 
-    string HTTPResponse::str()
+    string OutputBuffer::str()
     {
-        if (response_buf != "")
-        {
-            return response_buf;
-        }
         setHeader("Content-Length", std::to_string(_body.str().size()));
         std::stringstream ss;
         ss << "HTTP/1.1 " << _code << " " << HTTPCodeToStr(_code) << "\r\n";
@@ -80,11 +76,10 @@ namespace fastev
         }
         ss << "\r\n"
            << _body.str();
-        response_buf = ss.str();
-        return response_buf;
+        return ss.str();
     }
 
-    HTTPCode HTTPResponse::getCode()
+    HTTPCode OutputBuffer::getCode()
     {
         return _code;
     }

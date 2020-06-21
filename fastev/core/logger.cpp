@@ -16,8 +16,8 @@ namespace fastev
             return "WARN";
         case LogLevel::ERROR:
             return "ERROR";
-        case LogLevel::CRITICAL_ERROR:
-            return "CRIT";
+        case LogLevel::FATAL_ERROR:
+            return "FATAL";
         default:
             return "UNKNOWN";
         }

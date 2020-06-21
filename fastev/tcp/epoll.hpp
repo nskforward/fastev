@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 #ifndef FASTEV_REACTOR_POLL_SIZE
-#define FASTEV_REACTOR_POLL_SIZE 16
+#define FASTEV_REACTOR_POLL_SIZE 128
 #endif
 
 using namespace std;
@@ -29,13 +29,14 @@ namespace fastev
         function<void()> timer_cb;
         int registrySignal();
         int registryTimer(time_t seconds);
-        virtual void onSocketEvent(int fd) = 0;
+        virtual void onSocketEvent(int fd, void *ptr) = 0;
 
     public:
         Reactor();
         ~Reactor();
         void start();
-        void watchRead(int fd);
+        void watchRead(int fd, void *ptr);
+        void watchMaster(int fd);
         void unwatch(int fd);
         void onTimer(function<void()> func);
     };

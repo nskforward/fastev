@@ -1,24 +1,31 @@
-#include "byte_buffer.hpp"
+#include "input_buffer.hpp"
 
 namespace fastev
 {
-    void ByteBuffer::append(char *chunk, size_t size)
+    void InputBuffer::append(char *chunk, size_t size)
     {
-        //cout << "chunk size " << size << endl;
         for (size_t i = 0; i < size; i++)
         {
             char byte = chunk[i];
             switch (state)
             {
             // HTTP METHOD
-            case BufferState::method:
+            case InputBufferState::method:
+                if (byte == '\r' || byte == '\n')
+                {
+                    break;
+                }
                 if (byte == ' ')
                 {
                     data[pos] = '\0';
-                    onMethod(data);
+                    if (!onMethod(data))
+                    {
+                        //cout << chunk << endl;
+                        throw HTTPParserException("unknown http method: %s", method);
+                    }
                     strcpy(method, data);
                     pos = 0;
-                    state = BufferState::uri;
+                    state = InputBufferState::uri;
                     break;
                 }
                 data[pos++] = byte;
@@ -29,13 +36,13 @@ namespace fastev
                 break;
 
             // URI
-            case BufferState::uri:
+            case InputBufferState::uri:
                 if (byte == ' ')
                 {
                     data[pos] = '\0';
                     strcpy(uri, data);
                     pos = 0;
-                    state = BufferState::proto;
+                    state = InputBufferState::proto;
                     break;
                 }
                 data[pos++] = byte;
@@ -46,7 +53,7 @@ namespace fastev
                 break;
 
             // PROTO
-            case BufferState::proto:
+            case InputBufferState::proto:
                 if (byte == '\r')
                 {
                     data[pos] = '\0';
@@ -54,7 +61,7 @@ namespace fastev
                     strcpy(http_version, data);
                     pos = 0;
                     data[pos++] = byte;
-                    state = BufferState::eof;
+                    state = InputBufferState::eof;
                     break;
                 }
                 data[pos++] = byte;
@@ -65,12 +72,12 @@ namespace fastev
                 break;
 
             // EOF
-            case BufferState::eof:
+            case InputBufferState::eof:
                 if (byte != '\r' && byte != '\n')
                 {
                     pos = 0;
                     data[pos++] = byte;
-                    state = BufferState::header_name;
+                    state = InputBufferState::header_name;
                     break;
                 }
                 if (pos == 3 && data[0] == '\r' && data[1] == '\n' && data[2] == '\r' && byte == '\n')
@@ -86,7 +93,7 @@ namespace fastev
                 break;
 
             // HEADER NAME
-            case BufferState::header_name:
+            case InputBufferState::header_name:
                 if (byte == ':')
                 {
                     data[pos] = '\0';
@@ -102,7 +109,7 @@ namespace fastev
                 break;
 
             // HOST HEADER NAME
-            case BufferState::host:
+            case InputBufferState::host:
                 if (pos == 0 && byte == ' ')
                 {
                     continue;
@@ -113,7 +120,7 @@ namespace fastev
                     strcpy(host, data);
                     pos = 0;
                     data[pos++] = byte;
-                    state = BufferState::eof;
+                    state = InputBufferState::eof;
                     break;
                 }
                 data[pos++] = byte;
@@ -124,7 +131,7 @@ namespace fastev
                 break;
 
             // CONTENT TYPE HEADER
-            case BufferState::content_type:
+            case InputBufferState::content_type:
                 if (pos == 0 && byte == ' ')
                 {
                     continue;
@@ -135,7 +142,7 @@ namespace fastev
                     strcpy(content_type, data);
                     pos = 0;
                     data[pos++] = byte;
-                    state = BufferState::eof;
+                    state = InputBufferState::eof;
                     break;
                 }
                 data[pos++] = byte;
@@ -146,7 +153,7 @@ namespace fastev
                 break;
 
             // CONTENT LENGTH HEADER
-            case BufferState::content_len:
+            case InputBufferState::content_len:
                 if (pos == 0 && byte == ' ')
                 {
                     continue;
@@ -157,7 +164,7 @@ namespace fastev
                     strcpy(content_length, data);
                     pos = 0;
                     data[pos++] = byte;
-                    state = BufferState::eof;
+                    state = InputBufferState::eof;
                     break;
                 }
                 data[pos++] = byte;
@@ -168,7 +175,7 @@ namespace fastev
                 break;
 
             // AGENT HEADER
-            case BufferState::agent:
+            case InputBufferState::agent:
                 if (pos == 0 && byte == ' ')
                 {
                     continue;
@@ -179,7 +186,7 @@ namespace fastev
                     strcpy(agent, data);
                     pos = 0;
                     data[pos++] = byte;
-                    state = BufferState::eof;
+                    state = InputBufferState::eof;
                     break;
                 }
                 data[pos++] = byte;
@@ -190,7 +197,7 @@ namespace fastev
                 break;
 
             // HEADER VALUE
-            case BufferState::header_value:
+            case InputBufferState::header_value:
                 if (pos == 0 && byte == ' ')
                 {
                     continue;
@@ -200,7 +207,7 @@ namespace fastev
                     data[pos] = '\0';
                     pos = 0;
                     data[pos++] = byte;
-                    state = BufferState::eof;
+                    state = InputBufferState::eof;
                     break;
                 }
                 data[pos++] = byte;
@@ -216,10 +223,10 @@ namespace fastev
         }
     } // namespace fastev
 
-    void ByteBuffer::reset()
+    void InputBuffer::reset()
     {
         pos = 0;
-        state = BufferState::method;
+        state = InputBufferState::method;
         method[0] = '\0';
         uri[0] = '\0';
         http_version[0] = '\0';
@@ -230,29 +237,40 @@ namespace fastev
         is_full = false;
     }
 
-    bool ByteBuffer::isFull()
+    bool InputBuffer::isFull()
     {
         return is_full;
     }
 
-    char *ByteBuffer::getURI()
+    char *InputBuffer::getURI()
     {
         return uri;
     }
 
+    char *InputBuffer::getMethod()
+    {
+        return method;
+    }
+
+    char *InputBuffer::getHost()
+    {
+        return host;
+    }
+
     // PRIVATE METHODS
-    void ByteBuffer::onMethod(char *method)
+    bool InputBuffer::onMethod(char *method)
     {
         if (strcmp(method, "GET") != 0 &&
             strcmp(method, "POST") != 0 &&
             strcmp(method, "PUT") != 0 &&
             strcmp(method, "DELETE") != 0)
         {
-            throw HTTPParserException("unknown http method: %s", method);
+            return false;
         }
+        return true;
     }
 
-    void ByteBuffer::onProto(char *proto)
+    void InputBuffer::onProto(char *proto)
     {
         if (strcmp(method, "HTTP/1.0") == 0 &&
             strcmp(method, "HTTP/1.1") != 0 &&
@@ -263,23 +281,23 @@ namespace fastev
         }
     }
 
-    void ByteBuffer::onHeader(char *header)
+    void InputBuffer::onHeader(char *header)
     {
         if (strcmp(header, "Host") == 0)
         {
-            state = BufferState::host;
+            state = InputBufferState::host;
             return;
         }
         if (strcmp(header, "Content-Type") == 0)
         {
-            state = BufferState::content_type;
+            state = InputBufferState::content_type;
             return;
         }
         if (strcmp(header, "User-Agent") == 0)
         {
-            state = BufferState::agent;
+            state = InputBufferState::agent;
             return;
         }
-        state = BufferState::header_value;
+        state = InputBufferState::header_value;
     }
 } // namespace fastev

@@ -1,8 +1,8 @@
-#include "buffer_pool.hpp"
+#include "input_buffer_pool.hpp"
 
 namespace fastev
 {
-    BufferPool::~BufferPool()
+    InputBufferPool::~InputBufferPool()
     {
         for (size_t i = 0; i < pool.size(); i++)
         {
@@ -11,20 +11,20 @@ namespace fastev
         Logger::log(LogLevel::TRACE, "deleted %d buffers", pool.size());
     }
 
-    ByteBuffer *BufferPool::get()
+    InputBuffer *InputBufferPool::get()
     {
         if (pool.size() == 0)
         {
-            Logger::log(LogLevel::TRACE, "byte buffer allocation");
-            return new ByteBuffer();
+            Logger::log(LogLevel::TRACE, "++ buffer");
+            return new InputBuffer();
         }
-        ByteBuffer *buf = pool.back();
+        InputBuffer *buf = pool.back();
         buf->reset();
         pool.pop_back();
         return buf;
     }
 
-    void BufferPool::put(ByteBuffer *buf)
+    void InputBufferPool::put(InputBuffer *buf)
     {
         pool.push_back(buf);
     }

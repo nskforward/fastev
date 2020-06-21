@@ -1,36 +1,33 @@
-#ifndef FASTEV_HTTP_RESPONSE
-#define FASTEV_HTTP_RESPONSE
+#ifndef FASTEV_HTTP_OUTPUT_BUFFER
+#define FASTEV_HTTP_OUTPUT_BUFFER
 
 #include <string>
 #include <sstream>
 #include <map>
 #include <iterator>
 #include "utils.hpp"
-#include "request.hpp"
 
 using namespace std;
 
 namespace fastev
 {
-    class HTTPResponse
+    class OutputBuffer
     {
     private:
-        HTTPCode _code;
+        HTTPCode _code = HTTPCode::OK;
         stringstream _body;
-        string response_buf;
         map<string, string> _headers;
-        HTTPRequest _request;
 
     public:
-        HTTPResponse(HTTPRequest &request);
+        OutputBuffer(string host);
         void setCode(HTTPCode code);
         stringstream &body();
         void setHeader(string name, string value);
         string str();
         HTTPCode getCode();
-        HTTPRequest &getRequest();
+        void clearBody();
 
-        HTTPResponse &operator<<(string src)
+        OutputBuffer &operator<<(string src)
         {
             _body << src;
             return *this;

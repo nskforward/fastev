@@ -32,7 +32,7 @@ namespace fastev
             throw KernelException("timerfd_create() failed");
         }
         timerfd_settime(fd, TFD_TIMER_ABSTIME, &tspec, NULL);
-        watchRead(fd);
+        watchRead(fd, NULL);
         return fd;
     }
 
@@ -50,11 +50,23 @@ namespace fastev
         {
             throw KernelException("signalfd() failed");
         }
-        watchRead(fd);
+        watchRead(fd, NULL);
         return fd;
     }
 
-    void Reactor::watchRead(int fd)
+    void Reactor::watchRead(int fd, void *ptr)
+    {
+        struct epoll_event ev;
+        ev.events = EPOLLIN;
+        ev.data.fd = fd;
+        //ev.data.ptr = ptr;
+        if (epoll_ctl(event_base, EPOLL_CTL_ADD, fd, &ev) == -1)
+        {
+            throw KernelException("cannot registry an event");
+        }
+    }
+
+    void Reactor::watchMaster(int fd)
     {
         struct epoll_event ev;
         ev.events = EPOLLIN;
@@ -68,7 +80,7 @@ namespace fastev
     void Reactor::unwatch(int fd)
     {
         struct epoll_event ev;
-        ev.events = EPOLLIN;
+        ev.events = EPOLLIN | EPOLLET;
         ev.data.fd = fd;
         if (epoll_ctl(event_base, EPOLL_CTL_DEL, fd, &ev) == -1)
         {
@@ -88,7 +100,7 @@ namespace fastev
         struct epoll_event active_events[FASTEV_REACTOR_POLL_SIZE];
         while (active)
         {
-            int found_events = epoll_wait(event_base, active_events, FASTEV_REACTOR_POLL_SIZE, -1);
+            int found_events = epoll_wait(event_base, active_events, FASTEV_REACTOR_POLL_SIZE, 2000);
             if (found_events < 0)
             {
                 break;
@@ -112,7 +124,7 @@ namespace fastev
                     timer_cb();
                     continue;
                 }
-                onSocketEvent(active_events[i].data.fd);
+                onSocketEvent(active_events[i].data.fd, NULL);
             }
         }
     }

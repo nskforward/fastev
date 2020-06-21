@@ -1,4 +1,5 @@
 #include "fastev/http/server.hpp"
+
 using namespace fastev;
 
 int main()
@@ -6,10 +7,16 @@ int main()
     try
     {
         auto s = HTTPServer(8080);
-        s.onRequest([&](int fd, ByteBuffer *buf) {
-            s.httpReply(fd, HTTPCode::OK, "text/html;charset=UTF-8", buf->getURI());
+        s.onConnect([](int fd, struct sockaddr &addr) {
+            Logger::log(LogLevel::INFO, "connected");
         });
-        s.start();
+        s.onDisonnect([](int fd) {
+            Logger::log(LogLevel::INFO, "disconnected");
+        });
+        s.start([](InputBuffer *req, OutputBuffer *resp) {
+            resp->setHeader("Content-Type", "text/html;charset=UTF-8");
+            resp->body() << req->getMethod() << " " << req->getURI();
+        });
     }
     catch (std::exception &e)
     {

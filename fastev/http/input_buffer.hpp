@@ -28,7 +28,7 @@ using namespace std;
 
 namespace fastev
 {
-    enum BufferState
+    enum InputBufferState
     {
         method,
         uri,
@@ -43,7 +43,7 @@ namespace fastev
         eof
     };
 
-    class ByteBuffer
+    class InputBuffer
     {
     private:
         char data[FASTEV_HTTP_MAX_BODY_SIZE];
@@ -58,7 +58,7 @@ namespace fastev
         char content_type[FASTEV_HTTP_MAX_HEADER_VALUE_SIZE + 1];
         bool is_full;
 
-        void onMethod(char *method);
+        bool onMethod(char *method);
         void onProto(char *proto);
         void onHeader(char *header);
 
@@ -67,6 +67,8 @@ namespace fastev
         void append(char *chunk, size_t size);
         bool isFull();
         char *getURI();
+        char *getMethod();
+        char *getHost();
     };
 
 } // namespace fastev
