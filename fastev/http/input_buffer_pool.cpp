@@ -11,6 +11,14 @@ namespace fastev
         Logger::log(LogLevel::TRACE, "deleted %d buffers", pool.size());
     }
 
+    InputBufferPool::InputBufferPool(int size)
+    {
+        for (size_t i = 0; i < size; i++)
+        {
+            pool.push_back(new InputBuffer());
+        }
+    }
+
     InputBuffer *InputBufferPool::get()
     {
         if (pool.size() == 0)
@@ -27,5 +35,6 @@ namespace fastev
     void InputBufferPool::put(InputBuffer *buf)
     {
         pool.push_back(buf);
+        //Logger::log(LogLevel::INFO, "pool size %d", pool.size());
     }
 } // namespace fastev

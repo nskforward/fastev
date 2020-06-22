@@ -15,6 +15,7 @@ namespace fastev
         std::vector<InputBuffer *> pool;
 
     public:
+        InputBufferPool(int size);
         ~InputBufferPool();
         InputBuffer *get();
         void put(InputBuffer *buf);

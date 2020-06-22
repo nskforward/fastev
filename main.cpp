@@ -8,14 +8,15 @@ int main()
     {
         auto s = HTTPServer(8080);
         s.onConnect([](int fd, struct sockaddr &addr) {
-            Logger::log(LogLevel::INFO, "connected");
+            //Logger::log(LogLevel::INFO, "connected");
         });
         s.onDisonnect([](int fd) {
-            Logger::log(LogLevel::INFO, "disconnected");
+            //Logger::log(LogLevel::INFO, "disconnected");
         });
-        s.start([](InputBuffer *req, OutputBuffer *resp) {
-            resp->setHeader("Content-Type", "text/html;charset=UTF-8");
-            resp->body() << req->getMethod() << " " << req->getURI();
+        s.start([](InputBuffer *input_buffer, map<string, string> &response_headers, stringstream &response_body) {
+            response_headers["Content-Type"] = "text/html;charset=UTF-8";
+            response_body << "OK";
+            return 200;
         });
     }
     catch (std::exception &e)

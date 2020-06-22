@@ -23,6 +23,7 @@
 #include <iostream>
 #include "../core/logger.hpp"
 #include "exception.hpp"
+#include "output_buffer.hpp"
 
 using namespace std;
 
@@ -57,6 +58,7 @@ namespace fastev
         char agent[FASTEV_HTTP_MAX_HEADER_VALUE_SIZE + 1];
         char content_type[FASTEV_HTTP_MAX_HEADER_VALUE_SIZE + 1];
         bool is_full;
+        OutputBuffer output_buffer;
 
         bool onMethod(char *method);
         void onProto(char *proto);
@@ -69,6 +71,7 @@ namespace fastev
         char *getURI();
         char *getMethod();
         char *getHost();
+        OutputBuffer *getOutputBuffer();
     };
 
 } // namespace fastev

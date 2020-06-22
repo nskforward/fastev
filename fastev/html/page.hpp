@@ -22,7 +22,7 @@ namespace fastev
 
         friend OutputBuffer &operator<<(OutputBuffer &resp, HTMLPage &page)
         {
-            resp.body() << page.str();
+            //resp.body() << page.str();
             return resp;
         }
     };

@@ -14,24 +14,19 @@ namespace fastev
     class OutputBuffer
     {
     private:
+        char _data[8192];
         HTTPCode _code = HTTPCode::OK;
-        stringstream _body;
         map<string, string> _headers;
 
     public:
-        OutputBuffer(string host);
         void setCode(HTTPCode code);
-        stringstream &body();
+        char *getData();
         void setHeader(string name, string value);
-        string str();
+        string str(int code, map<string, string> &headers, stringstream &ss);
         HTTPCode getCode();
-        void clearBody();
-
-        OutputBuffer &operator<<(string src)
-        {
-            _body << src;
-            return *this;
-        }
+        map<string, string> &getHeaders();
+        void reset();
+        OutputBuffer();
     };
 
 } // namespace fastev

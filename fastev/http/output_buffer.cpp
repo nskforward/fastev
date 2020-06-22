@@ -1,61 +1,25 @@
 #include "output_buffer.hpp"
+#include "utils.hpp"
 
 namespace fastev
 {
-    std::string HTTPCodeToStr(HTTPCode code)
+    OutputBuffer::OutputBuffer()
     {
-        switch (code)
-        {
-        case HTTPCode::OK:
-            return "OK";
-
-        case HTTPCode::FOUND:
-            return "Found";
-
-        case HTTPCode::BAD_REQUEST:
-            return "Bad Request";
-
-        case HTTPCode::UNAUTHORIZED:
-            return "Unauthorized";
-
-        case HTTPCode::FORBIDDEN:
-            return "Forbidden";
-
-        case HTTPCode::NOT_FOUND:
-            return "Not Found";
-
-        case HTTPCode::REQUEST_TIMEOUT:
-            return "Request Timeout";
-
-        case HTTPCode::INTERNAL_SERVER_ERROR:
-            return "Internal Server Error";
-
-        case HTTPCode::SERVICE_UNAVAILABLE:
-            return "Service Unavailable";
-
-        default:
-            return "Unknown";
-        }
+        reset();
     }
-
-    OutputBuffer::OutputBuffer(string host)
-    {
-        _headers["Host"] = host;
-    }
-
     void OutputBuffer::setCode(HTTPCode code)
     {
         _code = code;
     }
 
-    void OutputBuffer::clearBody()
+    void OutputBuffer::reset()
     {
-        _body.str(string(""));
+        _data[0] = '\0';
     }
 
-    std::stringstream &OutputBuffer::body()
+    char *OutputBuffer::getData()
     {
-        return _body;
+        return _data;
     }
 
     void OutputBuffer::setHeader(std::string name, std::string value)
@@ -63,19 +27,24 @@ namespace fastev
         _headers[name] = value;
     }
 
-    string OutputBuffer::str()
+    map<string, string> &OutputBuffer::getHeaders()
     {
-        setHeader("Content-Length", std::to_string(_body.str().size()));
+        return _headers;
+    }
+
+    string OutputBuffer::str(int code, map<string, string> &headers, stringstream &body)
+    {
+        headers["Content-Length"] = std::to_string(body.str().size());
         std::stringstream ss;
-        ss << "HTTP/1.1 " << _code << " " << HTTPCodeToStr(_code) << "\r\n";
-        std::map<std::string, std::string>::iterator it = _headers.begin();
-        while (it != _headers.end())
+        ss << "HTTP/1.1 " << http_code_to_str(code) << "\r\n";
+        std::map<std::string, std::string>::iterator it = headers.begin();
+        while (it != headers.end())
         {
             ss << it->first << ": " << it->second << "\r\n";
             it++;
         }
         ss << "\r\n"
-           << _body.str();
+           << body.str();
         return ss.str();
     }
 

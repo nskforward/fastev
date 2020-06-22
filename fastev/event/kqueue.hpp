@@ -28,8 +28,9 @@ namespace fastev
     public:
         Reactor();
         ~Reactor();
-        void start(function<void(int fd)> callback);
+        void start(function<void(int fd, void *buff)> callback);
         void watch(int fd);
+        void watch(int fd, void *buff);
         void unwatch(int fd);
         void onTimer(function<void()> func);
         void registryTimer(time_t seconds);

@@ -55,9 +55,10 @@ int main()
         s.onDisonnect([](int fd) {
             Logger::log(LogLevel::INFO, "disconnected");
         });
-        s.start([](InputBuffer *req, OutputBuffer *resp) {
-            resp->setHeader("Content-Type", "text/html;charset=UTF-8");
-            resp->body() << req->getMethod() << " " << req->getURI();
+        s.start([](InputBuffer *input_buffer, map<string, string> &response_headers, stringstream &response_body) {
+            response_headers["Content-Type"] = "text/html;charset=UTF-8";
+            response_body << "OK";
+            return 200;
         });
     }
     catch (std::exception &e)
@@ -68,38 +69,19 @@ int main()
 ```
 
 ## Benchmark
-Testing of 2 HTTP servers based on different libraries to see the difference.
-The test scenario is returning called URI (to involve http parser).
+Run simple HTTP server with disabled logging on MacBook Pro (15-inch, 2019)
 
-### 1. HTTP server based on libevent
-```
-wrk -t5 -c100 -d20 http://localhost:8080/benchmark
-Running 20s test @ http://localhost:8080/benchmark
-  5 threads and 100 connections
-  Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency     1.25ms   81.27us   2.60ms   85.53%
-    Req/Sec    16.07k   458.11    17.15k    78.91%
-  1607146 requests in 20.10s, 193.12MB read
-Requests/sec:  79954.33
-Transfer/sec:      9.61MB
-```
-
-### 2. HTTP server based on fastev
 ```
 wrk -t10 -c100 -d20 http://localhost:8080/benchmark
 Running 20s test @ http://localhost:8080/benchmark
   10 threads and 100 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency     1.34ms    0.88ms  70.67ms   99.85%
-    Req/Sec     7.60k   249.56     8.18k    82.69%
-  1520768 requests in 20.10s, 165.34MB read
-Requests/sec:  75653.08
-Transfer/sec:      8.22MB
-
+    Latency   694.11us  106.66us   2.12ms   80.81%
+    Req/Sec    14.38k     1.36k   16.96k    76.82%
+  2876233 requests in 20.10s, 277.04MB read
+Requests/sec: 143098.52
+Transfer/sec:     13.78MB
 ```
-
-Fastev is able to serve x20 req/sec more than libevent on the same resources.
-
 
 ## How to build
 - install g++ make

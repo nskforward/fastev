@@ -18,7 +18,7 @@ namespace fastev
         SERVICE_UNAVAILABLE = 503
     };
 
-    std::string http_code_to_str(HTTPCode code);
+    std::string http_code_to_str(int code);
 } // namespace fastev
 
 #endif

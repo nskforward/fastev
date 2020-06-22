@@ -54,6 +54,12 @@ namespace fastev
         registryEvent();
     }
 
+    void Reactor::watch(int fd, void *buff)
+    {
+        EV_SET(&_ev, fd, EVFILT_READ, EV_ADD, 0, 0, buff);
+        registryEvent();
+    }
+
     void Reactor::unwatch(int fd)
     {
         EV_SET(&_ev, fd, EVFILT_READ, EV_DELETE, 0, 0, NULL);
@@ -61,7 +67,7 @@ namespace fastev
     }
 
     // START LOOP
-    void Reactor::start(function<void(int fd)> callback)
+    void Reactor::start(function<void(int fd, void *buff)> callback)
     {
         //Logger::log(LogLevel::INFO, "event lopp with method kqueue is running");
         struct kevent active_events[FASTEV_REACTOR_POLL_SIZE];
@@ -95,7 +101,7 @@ namespace fastev
                 // READ
                 if (active_events[i].filter == EVFILT_READ)
                 {
-                    callback(active_events[i].ident);
+                    callback(active_events[i].ident, active_events[i].udata);
                     continue;
                 }
                 Logger::log(LogLevel::ERROR, "unknown kqueue event: %d", active_events[i].filter);

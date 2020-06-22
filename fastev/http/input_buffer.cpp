@@ -300,4 +300,9 @@ namespace fastev
         }
         state = InputBufferState::header_value;
     }
+
+    OutputBuffer *InputBuffer::getOutputBuffer()
+    {
+        return &output_buffer;
+    }
 } // namespace fastev
