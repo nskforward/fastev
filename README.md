@@ -72,15 +72,15 @@ int main()
 Run simple HTTP server with disabled logging on MacBook Pro (15-inch, 2019)
 
 ```
-wrk -t10 -c100 -d20 http://localhost:8080/benchmark
+wrk -t4 -c100 -d20 http://localhost:8080/benchmark
 Running 20s test @ http://localhost:8080/benchmark
-  10 threads and 100 connections
+  4 threads and 100 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   694.11us  106.66us   2.12ms   80.81%
-    Req/Sec    14.38k     1.36k   16.96k    76.82%
-  2876233 requests in 20.10s, 277.04MB read
-Requests/sec: 143098.52
-Transfer/sec:     13.78MB
+    Latency   648.83us   89.45us  10.83ms   89.19%
+    Req/Sec    38.33k     1.94k   42.45k    65.80%
+  3066400 requests in 20.10s, 295.36MB read
+Requests/sec: 152555.26
+Transfer/sec:     14.69MB
 ```
 
 ## How to build

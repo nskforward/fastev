@@ -23,7 +23,7 @@ namespace fastev
     {
         if (pool.size() == 0)
         {
-            Logger::log(LogLevel::TRACE, "++ buffer");
+            //Logger::log(LogLevel::TRACE, "++ buffer");
             return new InputBuffer();
         }
         InputBuffer *buf = pool.back();

@@ -13,7 +13,7 @@ namespace fastev
     class HTTPServer : public TCPServer
     {
     private:
-        InputBufferPool buffer_pool = InputBufferPool(100);
+        InputBufferPool buffer_pool = InputBufferPool(16);
         function<void(InputBuffer *input_buffer, OutputBuffer *output_buffer)> on_request_cb;
         ThreadPool workers = ThreadPool(4);
 
