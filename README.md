@@ -57,7 +57,7 @@ int main()
         Logger::log(LogLevel::INFO, "[fd:%d] disconnected", fd);
     });
     s.onRequest([](Request &req) {
-        Logger::log(LogLevel::INFO, "[fd:%d] %s %s %s", req.fd(), req.worker_id(), req.method(), req.uri(), req.proto_ver());
+        Logger::log(LogLevel::INFO, "[fd:%d] %s %s %s", req.fd(), req.method(), req.uri(), req.proto_ver());
         req.answer("OK");
     });
     s.start();
