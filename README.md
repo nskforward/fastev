@@ -3,7 +3,7 @@ C++17 non-blocking event driven library to develop fast servers
 
 Supported platforms: macOS (kqueue), Linux (epoll)
 
-No external dependencies
+No external libraries
 
 Zero memory allocations in hot paths
 
