@@ -30,6 +30,7 @@ int main()
             Logger::log(LogLevel::INFO, "read %d bytes", size);
             send(fd, chunk, size, 0);
         });
+        s.start();
     }
     catch (std::exception &e)
     {
