@@ -1,9 +1,12 @@
+test:
+	g++ -std=c++17 ./tests/*.cpp -o ./build/test && ./build/test
+
 run:
-	g++ -std=c++17 ./*.cpp ./*/*/*.cpp -o ./build/app && clear && ./build/app
+	g++ -g -std=c++17 ./src/*.cpp ./src/*/*/*.cpp -o ./build/app_server && clear && ./build/app_server
 
 compile:
 	mkdir -p ./build
-	g++ -std=c++17 ./*.cpp ./*/*/*.cpp -o ./build/app
+	g++ -std=c++17 ./src/*.cpp ./src/*/*/*.cpp -o ./build/app_server
 
 trace:
 	g++ -g -std=c++17 ./*.cpp ./*/*/*.cpp -o ./build/app

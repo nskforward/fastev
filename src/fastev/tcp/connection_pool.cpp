@@ -1,3 +1,4 @@
+/*
 #include "connection_pool.hpp"
 
 namespace fastev
@@ -32,3 +33,4 @@ namespace fastev
         mtx.unlock();
     }
 } // namespace fastev
+*/

@@ -4,7 +4,6 @@
 #include <string>
 #include <sstream>
 #include "template.hpp"
-#include "../http/output_buffer.hpp"
 
 namespace fastev
 {
@@ -20,11 +19,13 @@ namespace fastev
         void title(std::string title);
         std::string str();
 
+        /*
         friend OutputBuffer &operator<<(OutputBuffer &resp, HTMLPage &page)
         {
             //resp.body() << page.str();
             return resp;
         }
+        */
     };
 
 } // namespace fastev

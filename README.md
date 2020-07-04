@@ -26,7 +26,8 @@ int main()
         s.onDisonnect([](int fd) {
             Logger::log(LogLevel::INFO, "disconnected");
         });
-        s.start([](int fd, char *chunk, size_t size) {
+        s.onChunk([&](int fd, int worker_id, const char *chunk, size_t size) {
+            Logger::log(LogLevel::INFO, "read %d bytes", size);
             send(fd, chunk, size, 0);
         });
     }
@@ -46,25 +47,19 @@ using namespace fastev;
 
 int main()
 {
-    try
-    {
-        auto s = HTTPServer(8080);
-        s.onConnect([](int fd, struct sockaddr &addr) {
-            Logger::log(LogLevel::INFO, "connected");
-        });
-        s.onDisonnect([](int fd) {
-            Logger::log(LogLevel::INFO, "disconnected");
-        });
-        s.start([](InputBuffer *input_buffer, map<string, string> &response_headers, stringstream &response_body) {
-            response_headers["Content-Type"] = "text/html;charset=UTF-8";
-            response_body << "OK";
-            return 200;
-        });
-    }
-    catch (std::exception &e)
-    {
-        Logger::log(LogLevel::FATAL_ERROR, e.what());
-    }
+    auto s = HTTPServer(8080);
+    s.onConnect([](int fd, struct sockaddr &addr) {
+        char ip[16];
+        Logger::log(LogLevel::INFO, "[fd:%d] connect from %s", fd, TCPSocket::addrToStr(addr, ip));
+    });
+    s.onDisonnect([](int fd, int worker_id) {
+        Logger::log(LogLevel::INFO, "[fd:%d] disconnected", fd);
+    });
+    s.onRequest([](Request &req) {
+        Logger::log(LogLevel::INFO, "[fd:%d] %s %s %s", req.fd(), req.worker_id(), req.method(), req.uri(), req.proto_ver());
+        req.answer("OK");
+    });
+    s.start();
 }
 ```
 
@@ -76,11 +71,11 @@ wrk -t4 -c100 -d20 http://localhost:8080/benchmark
 Running 20s test @ http://localhost:8080/benchmark
   4 threads and 100 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   648.83us   89.45us  10.83ms   89.19%
-    Req/Sec    38.33k     1.94k   42.45k    65.80%
-  3066400 requests in 20.10s, 295.36MB read
-Requests/sec: 152555.26
-Transfer/sec:     14.69MB
+    Latency   638.99us   59.19us   1.61ms   88.06%
+    Req/Sec    39.08k     2.90k   49.98k    75.97%
+  3123299 requests in 20.10s, 235.31MB read
+Requests/sec: 155388.43
+Transfer/sec:     11.71MB
 ```
 
 ## How to build

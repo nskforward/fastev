@@ -6,16 +6,20 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <netinet/tcp.h>
+#include "socket.hpp"
 #include "../core/exception.hpp"
+#include "../core/byte_buffer.hpp"
 
 namespace fastev
 {
     class TCPConnection
     {
+    private:
     public:
-        static int accept(int fd, struct sockaddr &addr);
-        static int listen(int port);
-        static void nonblocking(int fd);
+        ByteBuffer<1024> input;
+        ByteBuffer<1024> output;
+        TCPSocket *socket;
+        struct sockaddr addr = {0};
     };
 
 } // namespace fastev

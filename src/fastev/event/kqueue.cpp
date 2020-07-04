@@ -30,6 +30,16 @@ namespace fastev
         registryTimer(10);
     }
 
+    void Reactor::onRead(function<void(int fd)> func)
+    {
+        read_cb = func;
+    }
+
+    void Reactor::onWrite(function<void(int fd)> func)
+    {
+        write_cb = func;
+    }
+
     void Reactor::registryTimer(time_t seconds)
     {
         EV_SET(&_ev, 1, EVFILT_TIMER, EV_ADD | EV_ENABLE, NOTE_SECONDS, seconds, 0);
@@ -48,28 +58,37 @@ namespace fastev
         }
     }
 
-    void Reactor::watch(int fd)
+    void Reactor::watchRead(int fd)
     {
         EV_SET(&_ev, fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
         registryEvent();
     }
 
-    void Reactor::watch(int fd, void *buff)
+    void Reactor::watchWrite(int fd)
     {
-        EV_SET(&_ev, fd, EVFILT_READ, EV_ADD, 0, 0, buff);
+        EV_SET(&_ev, fd, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
         registryEvent();
     }
 
-    void Reactor::unwatch(int fd)
+    void Reactor::unwatchRead(int fd)
     {
         EV_SET(&_ev, fd, EVFILT_READ, EV_DELETE, 0, 0, NULL);
         registryEvent();
     }
 
-    // START LOOP
-    void Reactor::start(function<void(int fd, void *buff)> callback)
+    void Reactor::unwatchWrite(int fd)
     {
-        //Logger::log(LogLevel::INFO, "event lopp with method kqueue is running");
+        EV_SET(&_ev, fd, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
+        registryEvent();
+    }
+
+    // START LOOP
+    void Reactor::start()
+    {
+        if (read_cb == NULL)
+        {
+            throw KernelException("Reactor onRead callback is not defined");
+        }
         struct kevent active_events[FASTEV_REACTOR_POLL_SIZE];
         struct timespec kqTimeout = {5, 0}; // 5s
         while (_active)
@@ -101,7 +120,13 @@ namespace fastev
                 // READ
                 if (active_events[i].filter == EVFILT_READ)
                 {
-                    callback(active_events[i].ident, active_events[i].udata);
+                    read_cb(active_events[i].ident);
+                    continue;
+                }
+                // WRITE
+                if (active_events[i].filter == EVFILT_WRITE)
+                {
+                    write_cb(active_events[i].ident);
                     continue;
                 }
                 Logger::log(LogLevel::ERROR, "unknown kqueue event: %d", active_events[i].filter);

@@ -29,4 +29,11 @@ namespace fastev
         auto tt = std::chrono::system_clock::to_time_t(input);
         return std::gmtime(&tt);
     }
+
+    void Logger::write(LogLevel level, std::string &message)
+    {
+        mtx.lock();
+        std::cout << std::put_time(getTime(), "[%Y-%m-%d %X]") << " -" << levelStr(level) << "- " << message << std::endl;
+        mtx.unlock();
+    }
 } // namespace fastev

@@ -1,5 +1,5 @@
-#ifndef FASTEV_LOGGER_HPP
-#define FASTEV_LOGGER_HPP
+#ifndef FASTEV_CORE_LOGGER
+#define FASTEV_CORE_LOGGER
 
 #include "format.hpp"
 #include <iomanip>
@@ -26,10 +26,17 @@ namespace fastev
     class Logger
     {
     private:
-        static std::string levelStr(LogLevel level);
-        static tm *getTime();
+        std::string levelStr(LogLevel level);
+        tm *getTime();
+        std::mutex mtx;
+        void write(LogLevel level, std::string &message);
+        Logger(){};
+        static Logger &getInstance()
+        {
+            static Logger instance;
+            return instance;
+        }
 
-    protected:
     public:
         template <typename... Args>
         static void log(LogLevel level, const std::string format, Args... args)
@@ -39,7 +46,7 @@ namespace fastev
                 return;
             }
             auto str = Format::str(format, args...);
-            std::cout << std::put_time(getTime(), "[%Y-%m-%d %X]") << " -" << levelStr(level) << "- " << str << std::endl;
+            getInstance().write(level, str);
         }
     };
 

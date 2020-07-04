@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "../core/logger.hpp"
 #include "../core/exception.hpp"
+#include "../core/byte_buffer.hpp"
 
 #ifndef FASTEV_REACTOR_POLL_SIZE
 #define FASTEV_REACTOR_POLL_SIZE 256
@@ -21,6 +22,8 @@ namespace fastev
         int _event_base;
         struct kevent _ev;
         function<void()> timer_cb;
+        function<void(int fd)> read_cb;
+        function<void(int fd)> write_cb;
 
         void registryEvent();
         void registrySignal();
@@ -28,11 +31,14 @@ namespace fastev
     public:
         Reactor();
         ~Reactor();
-        void start(function<void(int fd, void *buff)> callback);
-        void watch(int fd);
-        void watch(int fd, void *buff);
-        void unwatch(int fd);
+        void start();
+        void watchRead(int fd);
+        void watchWrite(int fd);
+        void unwatchRead(int fd);
+        void unwatchWrite(int fd);
         void onTimer(function<void()> func);
+        void onRead(function<void(int fd)> func);
+        void onWrite(function<void(int fd)> func);
         void registryTimer(time_t seconds);
     };
 } // namespace fastev
