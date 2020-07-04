@@ -26,6 +26,7 @@
 #include "../core/byte_buffer.hpp"
 #include "exception.hpp"
 #include "parser.hpp"
+#include "utils.hpp"
 
 using namespace std;
 
@@ -52,6 +53,8 @@ namespace fastev
         unordered_map<string, string> &headers();
         ByteBuffer<1024> *body();
         void answer(string message);
+        void answer(int code, string message);
+        void answer(int code, string message, unordered_map<string, string> &headers);
     };
 
     Request::Request(int fd, int worker_id, ByteBuffer<1024> *buffer, size_t delimiter_pos)
@@ -65,12 +68,21 @@ namespace fastev
 
     void Request::answer(string message)
     {
-        std::stringstream ss;
-        unordered_map<string, string> headers;
-        headers["Content-Type"] = "text/html;charset=UTF-8";
-        headers["Content-Length"] = std::to_string(message.size());
+        answer(200, message);
+    }
 
-        ss << "HTTP/1.1 200 OK\r\n";
+    void Request::answer(int code, string message)
+    {
+        unordered_map<string, string> headers;
+        headers["Content-Type"] = "text/html;charset=utf-8";
+        answer(code, message, headers);
+    }
+
+    void Request::answer(int code, string message, unordered_map<string, string> &headers)
+    {
+        std::stringstream ss;
+        ss << "HTTP/1.1 " << http_code_to_str(code) << "\r\n";
+        headers["Content-Length"] = std::to_string(message.size());
         std::unordered_map<std::string, std::string>::iterator it = headers.begin();
         while (it != headers.end())
         {
@@ -84,6 +96,7 @@ namespace fastev
         {
             throw KernelException("partial send");
         }
+        Logger::log(LogLevel::INFO, "[#%d] %d %s %s %s", _fd, code, _method, _uri, _proto_ver);
     }
 
     char *Request::method()

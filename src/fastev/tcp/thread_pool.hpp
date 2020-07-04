@@ -65,11 +65,11 @@ namespace fastev
                                 switch (errno)
                                 {
                                 case ECONNRESET:
-                                    Logger::log(LogLevel::INFO, "[fd:%d] connection reset by peer", fd);
+                                    Logger::log(LogLevel::INFO, "[#%d] connection reset by peer", fd);
                                     break;
 
                                 default:
-                                    Logger::log(LogLevel::ERROR, "[fd:%d] recv returned error #%d", fd, errno);
+                                    Logger::log(LogLevel::ERROR, "[#%d] recv returned error #%d", fd, errno);
                                     break;
                                 }
                                 return;

@@ -20,12 +20,11 @@ namespace fastev
     private:
         bool _active = true;
         int _event_base;
-        struct kevent _ev;
         function<void()> timer_cb;
         function<void(int fd)> read_cb;
         function<void(int fd)> write_cb;
 
-        void registryEvent();
+        void registryEvent(struct kevent *ev);
         void registrySignal();
 
     public:

@@ -19,9 +19,10 @@ namespace fastev
 
     void Reactor::registrySignal()
     {
-        EV_SET(&_ev, SIGINT, EVFILT_SIGNAL, EV_ADD | EV_ENABLE, 0, 0, NULL);
+        struct kevent ev;
+        EV_SET(&ev, SIGINT, EVFILT_SIGNAL, EV_ADD | EV_ENABLE, 0, 0, NULL);
         signal(SIGINT, SIG_IGN);
-        registryEvent();
+        registryEvent(&ev);
     }
 
     void Reactor::onTimer(std::function<void()> func)
@@ -42,44 +43,53 @@ namespace fastev
 
     void Reactor::registryTimer(time_t seconds)
     {
-        EV_SET(&_ev, 1, EVFILT_TIMER, EV_ADD | EV_ENABLE, NOTE_SECONDS, seconds, 0);
-        registryEvent();
+        struct kevent ev;
+        EV_SET(&ev, 1, EVFILT_TIMER, EV_ADD | EV_ENABLE, NOTE_SECONDS, seconds, 0);
+        registryEvent(&ev);
     }
 
-    void Reactor::registryEvent()
+    void Reactor::registryEvent(struct kevent *ev)
     {
-        if (kevent(_event_base, &_ev, 1, NULL, 0, NULL) == -1)
+        if (kevent(_event_base, ev, 1, NULL, 0, NULL) == -1)
         {
-            throw KernelException("cannot registry an event");
+            if (errno == ENOENT)
+            {
+                throw KernelException("reactor: The event could	not be found to	be modified or deleted");
+            }
+            throw KernelException("error #%d: cannot registry an event", errno);
         }
-        if (_ev.flags & EV_ERROR)
+        if (ev->flags & EV_ERROR)
         {
-            throw KernelException("registered event returned an error: %s", strerror(_ev.data));
+            throw KernelException("registered event returned an error: %s", strerror(ev->data));
         }
     }
 
     void Reactor::watchRead(int fd)
     {
-        EV_SET(&_ev, fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
-        registryEvent();
+        struct kevent ev;
+        EV_SET(&ev, fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
+        registryEvent(&ev);
     }
 
     void Reactor::watchWrite(int fd)
     {
-        EV_SET(&_ev, fd, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
-        registryEvent();
+        struct kevent ev;
+        EV_SET(&ev, fd, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
+        registryEvent(&ev);
     }
 
     void Reactor::unwatchRead(int fd)
     {
-        EV_SET(&_ev, fd, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-        registryEvent();
+        struct kevent ev;
+        EV_SET(&ev, fd, EVFILT_READ, EV_DELETE, 0, 0, NULL);
+        registryEvent(&ev);
     }
 
     void Reactor::unwatchWrite(int fd)
     {
-        EV_SET(&_ev, fd, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
-        registryEvent();
+        struct kevent ev;
+        EV_SET(&ev, fd, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
+        registryEvent(&ev);
     }
 
     // START LOOP

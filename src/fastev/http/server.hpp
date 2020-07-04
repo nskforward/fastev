@@ -57,7 +57,15 @@ namespace fastev
         if (pos > 0)
         {
             auto req = Request(fd, worker_id, buff, pos);
-            on_request_cb(req);
+            try
+            {
+                on_request_cb(req);
+            }
+            catch (const std::exception &e)
+            {
+                req.answer(500, "Internal Server Error");
+                Logger::log(LogLevel::ERROR, e.what());
+            }
             buff->reset();
         }
     }

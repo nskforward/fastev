@@ -79,11 +79,11 @@ wrk -t4 -c100 -d20 http://localhost:8080/benchmark
 Running 20s test @ http://localhost:8080/benchmark
   4 threads and 100 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   638.99us   59.19us   1.61ms   88.06%
-    Req/Sec    39.08k     2.90k   49.98k    75.97%
-  3123299 requests in 20.10s, 235.31MB read
-Requests/sec: 155388.43
-Transfer/sec:     11.71MB
+    Latency   618.21us   22.18us   1.43ms   76.37%
+    Req/Sec    40.44k     1.09k   42.56k    63.31%
+  3235418 requests in 20.10s, 317.81MB read
+Requests/sec: 160965.09
+Transfer/sec:     15.81MB
 ```
 
 ## How to build
