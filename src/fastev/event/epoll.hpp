@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 #ifndef FASTEV_REACTOR_POLL_SIZE
-#define FASTEV_REACTOR_POLL_SIZE 128
+#define FASTEV_REACTOR_POLL_SIZE 256
 #endif
 
 using namespace std;
@@ -22,23 +22,27 @@ namespace fastev
     class Reactor
     {
     private:
-        bool active = true;
-        int event_base;
-        int sigint_fd;
-        int timer_fd;
+        bool _active = true;
+        int _event_base;
+        int _sigint_fd;
+        int _timer_fd;
         function<void()> timer_cb;
+        function<void(int fd)> read_cb;
+        function<void(int fd)> write_cb;
         int registrySignal();
         int registryTimer(time_t seconds);
-        virtual void onSocketEvent(int fd, void *ptr) = 0;
 
     public:
         Reactor();
         ~Reactor();
         void start();
-        void watchRead(int fd, void *ptr);
-        void watchMaster(int fd);
-        void unwatch(int fd);
+        void watchRead(int fd);
+        void watchWrite(int fd);
+        void unwatchRead(int fd);
+        void unwatchWrite(int fd);
         void onTimer(function<void()> func);
+        void onRead(function<void(int fd)> func);
+        void onWrite(function<void(int fd)> func);
     };
 } // namespace fastev
 #endif

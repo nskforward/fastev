@@ -1,3 +1,5 @@
+#if defined(__FreeBSD__) || defined(__APPLE__)
+
 #ifndef FASTEV_KQUEUE_HPP
 #define FASTEV_KQUEUE_HPP
 
@@ -42,4 +44,5 @@ namespace fastev
     };
 } // namespace fastev
 
+#endif
 #endif

@@ -1,3 +1,5 @@
+#if defined(__FreeBSD__) || defined(__APPLE__)
+
 #include "kqueue.hpp"
 
 namespace fastev
@@ -144,3 +146,5 @@ namespace fastev
         }
     }
 } // namespace fastev
+
+#endif

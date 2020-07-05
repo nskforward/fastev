@@ -1,7 +1,12 @@
 #ifndef FASTEV_TCP_SERVER
 #define FASTEV_TCP_SERVER
 
+#ifdef __linux__
+#include "../event/epoll.hpp"
+#endif
+#if defined(__FreeBSD__) || defined(__APPLE__)
 #include "../event/kqueue.hpp"
+#endif
 #include "thread_pool.hpp"
 #include "socket.hpp"
 
