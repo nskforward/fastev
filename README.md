@@ -85,9 +85,3 @@ Running 20s test @ http://localhost:8080/benchmark
 Requests/sec: 160965.09
 Transfer/sec:     15.81MB
 ```
-
-## How to build
-- install g++ make
-- open project folder in console
-- launch 'make compile'
-- launch './build/app'
