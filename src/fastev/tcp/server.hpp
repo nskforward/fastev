@@ -23,6 +23,7 @@ namespace fastev
         void onConnect(function<void(int fd, struct sockaddr &addr)> func);
         void onDisonnect(function<void(int fd, int worker_id)> func);
         void onChunk(function<void(int fd, int worker_id, const char *chunk, size_t size)> func);
+        void disconnectClient(int fd, int worker_id);
     };
 
     TCPServer::TCPServer(int port) : Reactor()
@@ -38,6 +39,11 @@ namespace fastev
         });
         Reactor::watchRead(_listener);
         Logger::log(LogLevel::INFO, "server is listening on port %d", port);
+    }
+
+    void TCPServer::disconnectClient(int fd, int worker_id)
+    {
+        pool.disconnect(fd, worker_id);
     }
 
     void TCPServer::onConnect(function<void(int fd, struct sockaddr &addr)> func)

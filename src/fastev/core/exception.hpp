@@ -18,7 +18,6 @@ namespace fastev
         KernelException(const std::string format, Args... args)
         {
             body = Format::str(format, args...);
-            //body = "KernelException: " + str;
         }
 
         const char *what() const throw()

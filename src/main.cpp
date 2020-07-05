@@ -15,7 +15,7 @@ int main()
             Logger::log(LogLevel::INFO, "[#%d] disconnect", fd);
         });
         s.onRequest([](Request &req) {
-            req.answer("Home page");
+            req.answer("OK");
         });
         s.start();
     }

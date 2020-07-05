@@ -99,6 +99,10 @@ namespace fastev
             memcpy(_data, _data + index, new_len);
             _pos = new_len;
         }
+        if (index == _pos)
+        {
+            _pos = 0;
+        }
     }
 
 } // namespace fastev
