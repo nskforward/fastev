@@ -2,7 +2,7 @@
 #define TESTING_FRAMEWORK
 
 #include <iostream>
-#include "../src/fastev/core/exception.hpp"
+#include "../core/exception.hpp"
 
 using namespace std;
 using namespace fastev;

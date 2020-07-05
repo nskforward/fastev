@@ -2,7 +2,7 @@ test:
 	g++ -pthread -std=c++17 ./tests/*.cpp -o ./build/test && ./build/test
 
 run:
-	g++ -pthread -g -std=c++17 ./src/*.cpp ./src/*/*/*.cpp -o ./build/app_server && clear && ./build/app_server
+	g++ -pthread -g -std=c++17 ./*.cpp ./*/*.cpp -o ./build/app_server && ./build/app_server
 
 compile:
 	mkdir -p ./build
