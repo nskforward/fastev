@@ -27,7 +27,7 @@ namespace fastev
         function<void(int fd)> write_cb;
 
         void registryEvent(struct kevent *ev);
-        void registrySignal();
+        void registrySignal(int signum);
 
     public:
         Reactor();

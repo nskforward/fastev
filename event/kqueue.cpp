@@ -11,7 +11,8 @@ namespace fastev
         {
             throw KernelException("cannot create event base kqueue");
         }
-        registrySignal();
+        registrySignal(SIGINT);
+        registrySignal(SIGTERM);
     }
 
     Reactor::~Reactor()
@@ -19,11 +20,11 @@ namespace fastev
         close(_event_base);
     }
 
-    void Reactor::registrySignal()
+    void Reactor::registrySignal(int signum)
     {
         struct kevent ev;
-        EV_SET(&ev, SIGINT, EVFILT_SIGNAL, EV_ADD | EV_ENABLE, 0, 0, NULL);
-        signal(SIGINT, SIG_IGN);
+        EV_SET(&ev, signum, EVFILT_SIGNAL, EV_ADD | EV_ENABLE, 0, 0, NULL);
+        signal(signum, SIG_IGN);
         registryEvent(&ev);
     }
 
